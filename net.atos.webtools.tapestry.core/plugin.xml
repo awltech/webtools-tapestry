@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="net.atos.webtools.tapestry.core.components.libs" 
+   		name="Component libs for Tapestry" 
+   		schema="schema/net.atos.webtools.tapestry.core.components.libs.exsd"/>
+   		
+   		<extension
+	       point="net.atos.webtools.tapestry.core.components.libs">
+	    <library
+	          appModule="org.apache.tapestry5.json.services.JSONModule"
+	          package="org.apache.tapestry5.json"
+	          prefix="core">
+	    </library>
+	    <library
+	          appModule="net.awl.tapestry5.kawwa.services.KawwaModule"
+	          package="net.awl.tapestry5.kawwa"
+	          prefix="kawwa">
+	    </library>
+	    <library
+	          appModule="net.awl.tapestry5.kawwa.services.AssetModule"
+	          package="net.awl.tapestry5.kawwa"
+	          prefix="kawwa">
+	    </library>
+	    <library
+	          appModule="net.atos.tapestry.optimize.services.OptimizeModule"
+	          package="net.atos.tapestry.optimize"
+	          prefix="">
+	    </library>
+	 </extension>
+     <extension
+           point="org.eclipse.ui.editors.templates">
+        <contextTypeRegistry
+              id="net.atos.webtools.tapestry.core.tapestry-context-type-registry">
+        </contextTypeRegistry>
+        <contextType
+              class="net.atos.webtools.tapestry.core.templates.PageTemplateContextType"
+              id="net.atos.webtools.tapestry.core.page-context-type"
+              name="New Page"
+              registryId="net.atos.webtools.tapestry.core.tapestry-context-type-registry">
+        </contextType>
+        <contextType
+              class="net.atos.webtools.tapestry.core.templates.ComponentTemplateContextType"
+              id="net.atos.webtools.tapestry.core.component-context-type"
+              name="New Component"
+              registryId="net.atos.webtools.tapestry.core.tapestry-context-type-registry">
+        </contextType>
+        <contextType
+              class="net.atos.webtools.tapestry.core.templates.ContentAssistContextType"
+              id="net.atos.webtools.tapestry.core.contentassist-context-type"
+              name="Content Assist"
+              registryId="net.atos.webtools.tapestry.core.tapestry-context-type-registry">
+        </contextType>
+        <include
+              file="tmlTemplate.xml">
+        </include>
+     </extension>
+     <extension
+           point="org.eclipse.ui.editors.templates">
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.EclipseProjectName"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Eclipse project name"
+              name="project name"
+              type="projectName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.EclipseProjectName"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Eclipse project name"
+              name="project name"
+              type="projectName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.EclipseProjectName"
+              contextTypeId="net.atos.webtools.tapestry.core.contentassist-context-type"
+              description="The Eclipse project name"
+              name="project name"
+              type="projectName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.GroupId"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Maven GroupId"
+              name="groupId"
+              type="groupId">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.GroupId"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Maven GroupId"
+              name="groupId"
+              type="groupId">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.ArtifactId"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Maven artifactId"
+              name="artifactId"
+              type="artifactId">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.ArtifactId"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Maven artifactId"
+              name="artifactId"
+              type="artifactId">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.ArtifactVersion"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Maven artifactVersion"
+              name="artifactVersion"
+              type="artifactVersion">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.maven.ArtifactVersion"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Maven artifactVersion"
+              name="artifactVersion"
+              type="artifactVersion">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppName"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Tapestry app name"
+              name="Tapestry app name"
+              type="appName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppName"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Tapestry app name"
+              name="Tapestry app name"
+              type="appName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppName"
+              contextTypeId="net.atos.webtools.tapestry.core.contentassist-context-type"
+              description="The Tapestry app name"
+              name="Tapestry app name"
+              type="appName">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppModule"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Tapestry app module"
+              name="Tapestry app module"
+              type="appModule">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppModule"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Tapestry app module"
+              name="Tapestry app module"
+              type="appModule">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppModule"
+              contextTypeId="net.atos.webtools.tapestry.core.contentassist-context-type"
+              description="The Tapestry app module"
+              name="Tapestry app module"
+              type="appModule">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppPackage"
+              contextTypeId="net.atos.webtools.tapestry.core.page-context-type"
+              description="The Tapestry app package"
+              name="Tapestry app package"
+              type="appPackage">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppPackage"
+              contextTypeId="net.atos.webtools.tapestry.core.component-context-type"
+              description="The Tapestry app package"
+              name="Tapestry app package"
+              type="appPackage">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.AppPackage"
+              contextTypeId="net.atos.webtools.tapestry.core.contentassist-context-type"
+              description="The Tapestry app package"
+              name="Tapestry app package"
+              type="appPackage">
+        </resolver>
+        <resolver
+              class="net.atos.webtools.tapestry.core.templates.variables.tapestry.CurrentFeature"
+              contextTypeId="net.atos.webtools.tapestry.core.contentassist-context-type"
+              description="The currently edited feature (page, component, mixin)"
+              name="Tapestry feature"
+              type="feature">
+        </resolver>
+     </extension>
+ 	
+</plugin>

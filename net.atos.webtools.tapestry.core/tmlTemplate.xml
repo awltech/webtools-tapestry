@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+<!-- ********************************************************************************** -->
+<!--								New page templates						 			-->
+<!-- ********************************************************************************** -->
+
+	<template name="Default Page" description="Default Page (for Tapestry 5.3)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.pageTemplate53" context="net.atos.webtools.tapestry.core.page-context-type">
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+&lt;html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+	&lt;head>
+		&lt;meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		&lt;meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		&lt;title>&lt;/title>		
+	&lt;/head>
+	&lt;body>
+	
+	&lt;/body>
+&lt;/html>
+	</template>
+
+	
+	<template name="Default Page (5.1/5.2)" description="Default Page (for Tapestry 5.2 or 5.1)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.pageTemplate" context="net.atos.webtools.tapestry.core.page-context-type">
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+&lt;html  xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	&lt;head>
+		&lt;meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		&lt;meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		&lt;title>&lt;/title>		
+	&lt;/head>
+	&lt;body>
+	
+	&lt;/body>
+&lt;/html>
+	</template>
+	
+
+	<template name="Page with Layout" description="Page with Layout (for Tapestry 5.3)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.pageTemplate.layout53" context="net.atos.webtools.tapestry.core.page-context-type">
+&lt;html t:type="Layout" t:title="New Page Title" t:id="layout" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+
+&lt;/html>
+	</template>
+
+
+	<template name="Page with Layout (5.1/5.2)" description="Page with Layout (for Tapestry 5.2 or 5.1)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.pageTemplate.layout" context="net.atos.webtools.tapestry.core.page-context-type">
+&lt;html t:type="Layout" t:title="New Page Title" t:id="layout" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+
+&lt;/html>
+	</template>
+	
+	
+<!-- ********************************************************************************** -->
+<!--							New component templates						 			-->
+<!-- ********************************************************************************** -->
+	
+	<template name="Container Component" description="Container Component (for Tapestry 5.3)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.componentTemplate53" context="net.atos.webtools.tapestry.core.component-context-type">
+&lt;t:container xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+
+&lt;/t:container>
+	</template>
+	
+	
+	<template name="Container Component (5.1/5.2)" description="Container Component (for Tapestry 5.2 or 5.1)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.componentTemplate" context="net.atos.webtools.tapestry.core.component-context-type">
+&lt;t:container xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+
+&lt;/t:container>
+	</template>
+	
+	
+	<template name="Layout Component" description="Layout Component (for Tapestry 5.3)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.componentTemplate.layout53" context="net.atos.webtools.tapestry.core.component-context-type">
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+&lt;html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+	&lt;head>
+		&lt;meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		&lt;meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		&lt;title>&lt;/title>
+	&lt;/head>
+
+&lt;!-- Page Body -->
+	&lt;body>
+	&lt;t:body/>
+	&lt;/body>
+&lt;/html>
+	</template>
+	
+
+	<template name="Layout Component (5.1/5.2)" description="Layout Component (for Tapestry 5.2 or 5.1)" autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.componentTemplate.layout" context="net.atos.webtools.tapestry.core.component-context-type">
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+&lt;html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	&lt;head>
+		&lt;meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		&lt;meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		&lt;title>&lt;/title>
+	&lt;/head>
+
+&lt;!-- Page Body -->
+	&lt;body>
+	&lt;t:body/>
+	&lt;/body>
+&lt;/html>
+	</template>
+	
+	
+<!-- ********************************************************************************** -->
+<!--									Code templates						 			-->
+<!-- ********************************************************************************** -->
+
+	<template name="ifElse" description="If/Else template" 
+		autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.contentassistTemplate.ifelse"  context="net.atos.webtools.tapestry.core.contentassist-context-type"
+>&lt;div t:type="If" t:test="" >
+	&lt;!-- if true -->
+	
+	&lt;p:else >
+		&lt;!-- if false -->
+		
+	&lt;/p:else>
+&lt;/div></template>
+	
+	<template name="Grid" description="Full Grid example" 
+		autoinsert="false" enabled="true"
+		id="net.atos.webtools.tapestry.core.contentassistTemplate.grid" context="net.atos.webtools.tapestry.core.contentassist-context-type"
+>&lt;table t:type="Grid" source="theSourceObjects" row="oneObject" add="delete">
+	&lt;!-- "name" must be a parameter of "oneObject"'s class -->
+	&lt;p:nameCell>
+		&lt;t:pagelink page="viewDetailsPage" context="oneObject.id">$${oneObject.name}&lt;/t:pagelink>
+	&lt;/p:nameCell>
+	&lt;p:deletecell>
+		&lt;t:actionlink t:id="delete" context="user.id">Delete&lt;/t:actionlink>
+	&lt;/p:deletecell>
+	&lt;p:empty>
+		&lt;p>Nothing to display; you can &lt;a t:type="Pagelink" page="addPage">add some&lt;/a>.&lt;/p>
+	&lt;/p:empty>
+&lt;/table>
+</template>
+	
+	
+</templates>

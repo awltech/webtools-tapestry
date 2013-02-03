@@ -1,8 +1,203 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>net.atos</groupId>
-  <artifactId>net.atos.webtools.tapestry.parent</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.atos</groupId>
+	<artifactId>webtools-tapestry-parent</artifactId>
+	<version>1.0.0.final</version>
+	<packaging>pom</packaging>
+	
+	<name>webtools-tapestry-parent</name>
+	<description>Web Tools for Tapestry: an eclipse plugin for developping on Apache Tapestry</description>
+	
+	<inceptionYear>2013</inceptionYear>
+	
+	<url>http://awltech.github.com/webtools-tapestry/</url>
+
+	<organization>
+		<name>awltech</name>
+		<url>https://github.com/awltech</url>
+	</organization>
+	
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License v3.0 only</name>
+			<url>http://www.spdx.org/licenses/LGPL-3.0</url>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Boris Naguet</name>
+			<roles>
+				<role>project leader</role>
+				<role>developer</role>
+			</roles>
+			<email>boris.naguet@atos.net</email>
+			<url>https://github.com/BorisNaguet</url>
+			<timezone>+1</timezone>
+			<organization>awltech</organization>
+		</developer>
+		<developer>
+			<name>Stifenson</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<url>https://github.com/Stifenson</url>
+			<timezone>+5.5</timezone>
+			<organization>awltech</organization>
+		</developer>
+	</developers>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/awltech/webtools-tapestry/issues</url>
+	</issueManagement>
+
+	<scm>
+		<developerConnection>scm:git:https://github.com/awltech/webtools-tapestry.git</developerConnection>
+		<connection>scm:git:git://github.com/awltech/webtools-tapestry.git</connection>
+		<url>https://github.com/awltech/webtools-tapestry</url>
+	</scm>
+	
+	<reporting>
+		
+	</reporting>
+	
+	<modules>
+		<module>net.atos.webtools.tapestry.core</module>
+		<module>net.atos.webtools.tapestry.ui</module>
+		<module>webtools-tapestry-repository</module>
+		<module>net.atos.webtools.tapestry</module>
+	</modules>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tycho-version>0.14.0</tycho-version>
+		<format>yyyyMMddHHmm</format>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<format>'.final'</format>
+			</properties>
+		</profile>
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>indigo</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/indigo</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.5.1</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.12</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-report-plugin</artifactId>
+					<version>2.12</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.1.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.8.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-archetype-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<format>${format}</format>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-publisher-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<publishArtifacts>true</publishArtifacts>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			
+		</plugins>
+	</build>
+
 </project>

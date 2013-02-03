@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.wst.html.core.htmlsource"
+            default-charset="UTF-8"
+            file-extensions="tml"
+            id="net.atos.webtools.tapestry.ui.template-content-type"
+            name="Tapestry Template"
+            priority="high">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.jdt.core.javaSource"
+            default-charset="UTF-8"
+            file-extensions="java"
+            id="net.atos.webtools.tapestry.ui.java-content-type"
+            name="Tapestry Java file"
+            priority="low">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.jdt.core.javaClass"
+            default-charset="UTF-8"
+            file-extensions="class"
+            id="net.atos.webtools.tapestry.ui.class-content-type"
+            name="Tapestry Class file"
+            priority="low">
+      </content-type>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.atos.webtools.tapestry.ui.editors.multi.TapestryMultiPageEditor"
+            contributorClass="net.atos.webtools.tapestry.ui.editors.multi.MultiPageEditorContributor"
+            default="false"
+            extensions="tml,java,class"
+            icon="icons/tapestry.gif"
+            id="net.atos.webtools.tapestry.ui.tapestry-multi-page-editor"
+            matchingStrategy="net.atos.webtools.tapestry.ui.editors.multi.MatchingStrategy"
+            name="Tapestry Editor">
+         <contentTypeBinding
+               contentTypeId="net.atos.webtools.tapestry.ui.template-content-type">
+         </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="net.atos.webtools.tapestry.ui.java-content-type">
+         </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="net.atos.webtools.tapestry.ui.class-content-type">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.wst.sse.ui.editorConfiguration">
+      <sourceViewerConfiguration
+            class="net.atos.webtools.tapestry.ui.editors.tml.StructuredTextViewerConfiguration"
+            target="net.atos.webtools.tapestry.ui.template-content-type">
+      </sourceViewerConfiguration>
+   </extension>
+   
+   
+	<!-- ================================================== -->
+	<!-- Contribute a 'New Wizard' for Tapestry             -->
+	<!-- ================================================== -->
+ <extension
+       point="org.eclipse.wst.sse.ui.completionProposal">
+    <proposalCategory
+          icon="icons/tapestry_PE.gif"
+          id="net.atos.webtools.tapestry.ui.PropertyExpressionsProposalCategory"
+          name="Tapestry Property Expressions">
+    </proposalCategory>
+    <proposalComputer
+          activate="true"
+          categoryId="net.atos.webtools.tapestry.ui.PropertyExpressionsProposalCategory"
+          class="net.atos.webtools.tapestry.ui.editors.tml.assist.PropertyExpressionsCompletionProposalComputer"
+          icon="icons/tapestry_PE.gif"
+          id="net.atos.webtools.tapestry.ui.propertyExpressionsProposalComputer"
+          name="Tapestry Property Expressions Proposals">
+       <contentType
+             id="net.atos.webtools.tapestry.ui.template-content-type">
+       </contentType>
+    </proposalComputer>
+    <proposalCategory
+          icon="icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.TagsProposalCategory"
+          name="Tapestry Tags">
+    </proposalCategory>
+    <proposalComputer
+          activate="true"
+          categoryId="net.atos.webtools.tapestry.ui.TagsProposalCategory"
+          class="net.atos.webtools.tapestry.ui.editors.tml.assist.TagsCompletionProposalComputer"
+          icon="icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.tagsProposalComputer"
+          name="Tapestry Tags Proposals">
+       <contentType
+             id="net.atos.webtools.tapestry.ui.template-content-type">
+       </contentType>
+    </proposalComputer>
+    <proposalCategory
+          icon="icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.TagsParametersProposalCategory"
+          name="Tapestry Tags Parameters">
+    </proposalCategory>
+    <proposalComputer
+          activate="true"
+          categoryId="net.atos.webtools.tapestry.ui.TagsParametersProposalCategory"
+          class="net.atos.webtools.tapestry.ui.editors.tml.assist.TagsParametersCompletionProposalComputer"
+          icon="icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.tagsParametersProposalComputer"
+          name="Tapestry Tag Parameters Proposals">
+       <contentType
+             id="net.atos.webtools.tapestry.ui.template-content-type">
+       </contentType>
+    </proposalComputer>
+    <proposalCategory
+          icon="icons/tapestry_T.gif"
+          id="net.atos.webtools.tapestry.ui.TemplatesProposalCategory"
+          name="Tapestry Templates">
+    </proposalCategory>
+    <proposalComputer
+          activate="true"
+          categoryId="net.atos.webtools.tapestry.ui.TemplatesProposalCategory"
+          class="net.atos.webtools.tapestry.ui.editors.tml.assist.TemplatesCompletionProposalComputer"
+          icon="icons/tapestry_T.gif"
+          id="net.atos.webtools.tapestry.ui.tapestryTemplatesProposalComputer"
+          name="Tapestry Templates Proposals">
+       <contentType
+             id="net.atos.webtools.tapestry.ui.template-content-type">
+       </contentType>
+    </proposalComputer>
+ </extension>
+ <extension
+       point="org.eclipse.wst.sse.ui.completionProposalCategoriesConfiguration">
+    <categoriesConfiguration
+          class="net.atos.webtools.tapestry.ui.editors.tml.assist.ProposalCategoriesConfig"
+          contentTypeID="net.atos.webtools.tapestry.ui.template-content-type">
+    </categoriesConfiguration>
+ </extension>
+ 
+ <!--
+ <extension
+       point="org.eclipse.wst.sse.ui.sourcevalidation">
+    <validator
+          class="net.atos.webtools.tapestry.ui.editor.editors.tml.sourcevalidators.AttributeUnicity"
+          id="net.atos.webtools.tapestry.ui.editor.editors.tml.sourcevalidators.AttributeUnicity"
+          scope="partial">
+       <contentTypeIdentifier
+             id="net.atos.webtools.tapestry.ui.template-content-type">
+          <partitionType
+                id="org.eclipse.wst.html.HTML_DEFAULT">
+          </partitionType></contentTypeIdentifier>
+    </validator>
+ </extension>
+ <extension
+       id="net.atos.webtools.tapestry.ui.AbstractValidator1"
+       name="AbstractValidator1"
+       point="org.eclipse.wst.validation.validatorV2">
+    <validator
+          build="true"
+          class="net.atos.webtools.tapestry.ui.editor.editors.tml.sourcevalidators.AbstractValidator1"
+          manual="true"
+          sourceid="net.atos.webtools.tapestry.ui.editor.editors.tml.sourcevalidators.XmlValidator">
+       <include>
+          <rules>
+             <contentType
+                   exactMatch="true"
+                   id="net.atos.webtools.tapestry.ui.template-content-type">
+             </contentType>
+          </rules>
+       </include>
+       <exclude>
+          <rules>
+             <file
+                   caseSensitive="true"
+                   name="target"
+                   type="folder">
+             </file>
+          </rules>
+       </exclude>
+    </validator>
+ </extension>
+ -->
+ 
+ <extension
+       point="org.eclipse.ui.newWizards">
+    <category
+          id="net.atos.webtools.tapestry.ui.wizard-category"
+          name="%net.atos.webtools.tapestry.ui.wizard-category">
+    </category>
+    <wizard
+          category="net.atos.webtools.tapestry.ui.wizard-category"
+          class="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard"
+          icon="/icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard"
+          name="%net.atos.webtools.tapestry.ui.wizard-newpage"
+          project="false">
+       <description>
+          %net.atos.webtools.tapestry.ui.wizard-newpage-description
+       </description>
+       <selection
+             class="org.eclipse.core.resources.IResource">
+       </selection>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.tapestry">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.webtools">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.xa">
+       </keywordReference>
+    </wizard>
+    <wizard
+          category="net.atos.webtools.tapestry.ui.wizard-category"
+          class="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard"
+          icon="/icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard"
+          name="%net.atos.webtools.tapestry.ui.wizard-component"
+          project="false">
+       <description>
+          %net.atos.webtools.tapestry.ui.wizard-component-description
+       </description>
+       <selection
+             class="org.eclipse.core.resources.IResource">
+       </selection>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.tapestry">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.webtools">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.xa">
+       </keywordReference>
+    </wizard>
+ </extension>
+ 
+ <extension
+       point="org.eclipse.ui.perspectiveExtensions">
+    <perspectiveExtension
+          targetID="org.eclipse.jdt.ui.JavaPerspective">
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard">
+       </newWizardShortcut>
+    </perspectiveExtension>
+    <perspectiveExtension
+          targetID="org.eclipse.jst.j2ee.J2EEPerspective">
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard">
+       </newWizardShortcut>
+    </perspectiveExtension>
+    <perspectiveExtension
+          targetID="org.eclipse.wst.web.ui.webDevPerspective">
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard">
+       </newWizardShortcut>
+    </perspectiveExtension>
+ </extension>
+ <extension
+       point="org.eclipse.ui.contexts">
+    <context
+          description="When in the Tapestry Editor"
+          id="net.atos.webtools.tapestry.ui.editor-context"
+          name="Tapestry Editor Context">
+    </context>
+ </extension>
+ <extension
+       point="org.eclipse.ui.commandImages">
+    <image
+          commandId="net.atos.webtools.tapestry.ui.command.switchEditor"
+          icon="icons/tapestry.gif">
+    </image>
+ </extension>
+ <extension
+       point="org.eclipse.ui.commands">
+    <category
+          description="Web Tools for Tapestry commands category"
+          id="net.atos.webtools.tapestry.ui.category"
+          name="Web Tools for Tapestry">
+    </category>
+    <command
+          categoryId="net.atos.webtools.tapestry.ui.category"
+          defaultHandler="net.atos.webtools.tapestry.ui.editors.multi.SwitchEditorHandler"
+          description="This command is used to switch from tab to tab in the Tapestry editor"
+          id="net.atos.webtools.tapestry.ui.command.switchEditor"
+          name="Switch Tapestry Editor tab">
+    </command>
+ </extension>
+ <extension
+       point="org.eclipse.ui.bindings">
+    <key
+          commandId="net.atos.webtools.tapestry.ui.command.switchEditor"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+Q">
+    </key>
+ </extension>
+ <extension
+       point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+    <target
+          id="net.atos.webtools.tapestry.ui.hyperlink.detectorTarget"
+          name="Tapestry Editor">
+    </target>
+ </extension>
+ <extension
+       point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+    <hyperlinkDetector
+          activate="true"
+          class="net.atos.webtools.tapestry.ui.editors.tml.hyperlinks.ComponentHyperlinkDetector"
+          id="net.atos.webtools.tapestry.ui.ComponentHyperlinkDetector"
+          name="ComponentHyperlinkDetector"
+          targetId="net.atos.webtools.tapestry.ui.hyperlink.detectorTarget">
+    </hyperlinkDetector>
+ </extension>
+ <extension
+       point="org.eclipse.ui.preferencePages">
+    <page
+          category="net.atos.webtools.tapestry.ui.preferences.TapestryPreferencePage"
+          class="net.atos.webtools.tapestry.ui.preferences.TapestryTemplatePreferencePage"
+          id="net.atos.webtools.tapestry.ui.preferences.TapestryTemplatePreferencePage"
+          name="Templates">
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.tapestry">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.webtools">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.xa">
+       </keywordReference>
+    </page>
+    <page
+          category="net.atos.webtools.tapestry.ui.preferences.TapestryPreferencePage"
+          class="net.atos.webtools.tapestry.ui.preferences.ContentAssistPreferencePage"
+          id="net.atos.webtools.tapestry.ui.preferences.TapestryContentAssistPreferencePage"
+          name="Content Assist">
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.tapestry">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.webtools">
+       </keywordReference>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.xa">
+       </keywordReference>
+    </page>
+    <page
+          category="org.eclipse.wst.html.ui.preferences.web"
+          class="net.atos.webtools.tapestry.ui.preferences.TapestryPreferencePage"
+          id="net.atos.webtools.tapestry.ui.preferences.TapestryPreferencePage"
+          name="Tapestry [WTT]">
+    </page>
+ </extension>
+ 
+ 	<!-- initialize html ui preferences -->
+	<extension point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="net.atos.webtools.tapestry.ui.preferences.TapestryPreferenceInitializer" />
+	</extension>
+ <extension
+       point="org.eclipse.ui.keywords">
+    <keyword
+          id="net.atos.webtools.tapestry.ui.keywords.xa"
+          label="xa">
+    </keyword>
+    <keyword
+          id="net.atos.webtools.tapestry.ui.keywords.webtools"
+          label="webtools">
+    </keyword>
+    <keyword
+          id="net.atos.webtools.tapestry.ui.keywords.tapestry"
+          label="tapestry">
+    </keyword>
+ </extension>
+</plugin>

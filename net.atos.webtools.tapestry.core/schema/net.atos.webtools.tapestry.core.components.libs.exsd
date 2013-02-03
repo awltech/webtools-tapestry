@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="net.atos.xa.webtools.tapestry.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="net.atos.xa.webtools.tapestry.core" id="components.libs" name="Component libs for Tapestry"/>
+      </appinfo>
+      <documentation>
+         This extension point allows to supply the needed information for component loading from classpath libraries: this is needed for auto-completion.
+For most cases, standard Tapestry libraries are discovered automatically, but some can be have an &quot;alternative structure&quot;, that is yet to be managed, and here is only a workaround.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="library" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="library">
+      <annotation>
+         <documentation>
+            Defines a Tapestry lib with components that must be loaded for auto-completion
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="appModule" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Full path to the AppModule, as defined in the MANIFEST.MF (&quot;tapestry-Module-Classes:&quot; attribute)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="prefix" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The Tapestry prefix for this library
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="package" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the base app package
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>
