@@ -14,8 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.atos.webtools.tapestry.core.TapestryCore;
+import net.atos.webtools.tapestry.core.models.features.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.MixinModel;
 import net.atos.webtools.tapestry.core.models.features.PageModel;
@@ -28,6 +31,7 @@ import net.atos.webtools.tapestry.core.util.Messages;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -51,6 +55,7 @@ import org.eclipse.jdt.internal.core.JarEntryDirectory;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.util.Util;
 /**
  * This {@link Job} parses all the project to found Tapestry "features" 
  * (components, or pages, or mixins...) and to add them to the {@link ProjectModel}
@@ -68,7 +73,8 @@ public class FeatureFinder extends Job{
 	private static final String GET_ROOT_PACKAGE = "getRootPackage";
 	private static final String GET_PATH_PREFIX = "getPathPrefix";
 	private static final String CONTRIBUTE_COMPONENT_CLASS_RESOLVER = "contributeComponentClassResolver";
-	
+	private static final String FILE_PATTERN = 
+            "((.*?)+(\\.(?i)(java|tml|properties|xml|manifest|class))$)";
 	private ProjectModel projectModel;
 	
 	/**
@@ -148,7 +154,7 @@ public class FeatureFinder extends Job{
 				
 				//---------- STEP-2: look in sources for custom components ------------
 				else {
-					
+					loadContextAssets(iPackageFragmentRoot);
 					//STEP-2-A: sources from the project itself:
 					if(iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()){
 						if(projectModel.getAppPackage() != null){
@@ -183,6 +189,59 @@ public class FeatureFinder extends Job{
 		return new Status(IStatus.OK, TapestryCore.PLUGIN_ID, Messages.JOB_DONE);
 	}
 	
+        private void loadContextAssets(IPackageFragmentRoot iPackageFragmentRoot) {
+		if(iPackageFragmentRoot != null && iPackageFragmentRoot.exists() && iPackageFragmentRoot.getPath().toString().contains("webapp")){
+			Object[] resources=null; 
+			try {
+				resources = iPackageFragmentRoot.getNonJavaResources();
+			} catch (JavaModelException e) {
+				TapestryCore.logWarning(ErrorMessages.CAN_T_LOAD_TAPESTRY_ASSETS_FROM + iPackageFragmentRoot.getElementName() 
+						+ " : " + iPackageFragmentRoot.getJavaProject().getElementName(), e);
+				return;
+			}
+			
+			Pattern pattern = Pattern.compile(FILE_PATTERN);
+			for(Object asset:resources){
+				if(IFolder.class.isInstance(asset)){
+					IFolder folder = (IFolder)asset;
+					if(!("WEB-INF".equals(folder.getName()))){
+						findAssetsFromFolder(folder,iPackageFragmentRoot);
+					}else{
+						continue;
+					}
+				}else if(IFile.class.isInstance(asset)){
+					IFile iFile =(IFile)asset;
+					Matcher matcher = pattern.matcher(iFile.getName());
+					if(!matcher.matches()){
+						projectModel.addAsset(new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1)));
+					}
+				}
+			}
+		}
+	}
+	
+	private void findAssetsFromFolder(IFolder folder,IPackageFragmentRoot iPackageFragmentRoot){
+		try {
+			List<IFolder> folders = new ArrayList<IFolder>();
+			Pattern pattern = Pattern.compile(FILE_PATTERN);
+			for(IResource iResource:folder.members()){
+				if(IFolder.class.isInstance(iResource)){
+					folders.add((IFolder)iResource);
+				}else if(IFile.class.isInstance(iResource)){
+					IFile iFile=(IFile)iResource;
+					Matcher matcher = pattern.matcher(iFile.getName());
+					if(!matcher.matches()){
+						projectModel.addAsset(new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1)));
+					}
+				}
+			}
+			for(IFolder fldr:folders){
+				findAssetsFromFolder(fldr,iPackageFragmentRoot);
+			}
+			
+		} catch (CoreException e) {
+		}
+	}
 	/**
 	 * 
 	 * 
