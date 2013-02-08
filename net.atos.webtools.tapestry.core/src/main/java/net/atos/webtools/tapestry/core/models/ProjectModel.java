@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.Manifest;
 
 import net.atos.webtools.tapestry.core.TapestryCore;
+import net.atos.webtools.tapestry.core.models.features.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.MixinModel;
 import net.atos.webtools.tapestry.core.models.features.PageModel;
@@ -104,7 +105,16 @@ public class ProjectModel {
 
 	private Map<String, ServiceModel> servicesByFullName = new ConcurrentHashMap<String, ServiceModel>();
 	
-	/**
+        /**
+	 * List of the assets dynamically found.
+	 * 
+	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
+	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
+	 */
+	private Collection<AssetModel> aasets = new ConcurrentLinkedQueue<AssetModel>();
+	
+	private Map<String,AssetModel> assetsByFullName = new ConcurrentHashMap<String, AssetModel>();
+  	/**
 	 * Technical property, used to avoid reloading the model too often
 	 * 
 	 * @see TapestryCore
@@ -220,6 +230,22 @@ public class ProjectModel {
 		return initDate;
 	}
 
+        void addAsset(AssetModel asset){
+		if(asset != null){
+			aasets.add(asset);
+			assetsByFullName.put(asset.getName(), asset);
+		}
+	}
+	public Collection<AssetModel> getAssets() {
+		return aasets;
+	}
+	
+	public AssetModel getAsset(String fullName) {
+		if(fullName != null){
+			return assetsByFullName.get(fullName.toLowerCase().trim());
+		}
+		return null;
+	}
 
 	/**
 	 * Constructs asynchronously the project model: only the {@link JavaProject} is set directly, 
