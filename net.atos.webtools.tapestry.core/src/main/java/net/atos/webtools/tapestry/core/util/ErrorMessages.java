@@ -52,4 +52,6 @@ public class ErrorMessages {
 	public static final String CAN_T_LOAD_PARAMETERS_FOR_TYPE = "Can't load parameters for type";
 	public static final String CAN_T_LOOK_FOR_FEATURE_S_MESSAGES = "Can't look for feature's messages";
 	public static final String NOT_ABLE_TO_PERSIST_USER_PREFERENCES = "Not able to persist user preferences";
+	// Asset
+	public static final String CAN_T_LOAD_TAPESTRY_ASSETS_FROM = "Can't load Tapestry assets from ";
 }

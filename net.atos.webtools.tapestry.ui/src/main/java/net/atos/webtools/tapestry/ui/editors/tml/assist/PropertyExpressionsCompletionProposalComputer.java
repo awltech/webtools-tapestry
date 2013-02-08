@@ -3,14 +3,17 @@
 import static net.atos.webtools.tapestry.core.util.Constants.ASSET_BINDING;
 import static net.atos.webtools.tapestry.core.util.Constants.ASSET_CLASSPATH_BINDING;
 import static net.atos.webtools.tapestry.core.util.Constants.ASSET_CONTEXT_BINDING;
+import static net.atos.webtools.tapestry.core.util.Constants.ASSET_CONTEXT_ONLY_BINDING;
 import static net.atos.webtools.tapestry.core.util.Constants.MESSAGE_BINDING;
 import static net.atos.webtools.tapestry.core.util.Constants.PROP_BINDING;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import net.atos.webtools.tapestry.core.models.JavaElement;
+import net.atos.webtools.tapestry.core.models.features.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.Parameter;
 import net.atos.webtools.tapestry.core.util.Constants;
@@ -35,8 +38,7 @@ import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
  */
 @SuppressWarnings("restriction")
 public class PropertyExpressionsCompletionProposalComputer extends AbstractTapestryCompletionProposalComputer {
-	private static final String[] keywords = {ASSET_CONTEXT_BINDING, ASSET_CLASSPATH_BINDING, 
-			"true", "false", "this", "null"};
+	private static final String[] keywords = {"true", "false", "this", "null"};
 	
 	@Override
 	public void sessionStarted() {
@@ -203,6 +205,60 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			if(! PROP_BINDING.equals(defaultPrefix)){
 				prefix = PROP_BINDING;
 			}
+                        //------------ PART-1 proposal for asset---------------------
+			//Proposal for asset:,asset:context:,context: for attribute value
+			
+			String alreadyTypedAsset = getTypedBefore(wholeDocument, context.getInvocationOffset());
+			String[] assetBindins = {ASSET_CONTEXT_BINDING,ASSET_CONTEXT_ONLY_BINDING,ASSET_BINDING,ASSET_CLASSPATH_BINDING}; 
+			
+			for(String assetBinding:assetBindins){
+				if(assetBinding.toLowerCase().startsWith(alreadyTypedAsset.toLowerCase().replace("${", ""))){
+					int offset = context.getInvocationOffset() - alreadyTypedAsset.length();
+					int replacementLength = getAttributeReplacementLength(wholeDocument, context.getInvocationOffset()) + alreadyTypedAsset.length();
+					String toBeInserted = null;
+					if(!isAssetTagEnds(wholeDocument, context.getInvocationOffset())){
+						toBeInserted = "${"+assetBinding +"}";
+					}else{
+						toBeInserted = "${"+assetBinding;
+					}
+					proposals.add(
+							new CustomCompletionProposal(toBeInserted, 				//replacementString 
+													offset, 						//replacementOffset
+													replacementLength,				//replacementLength
+													toBeInserted.length(),			//cursorPosition
+													imagePE, 						//image
+													assetBinding, 					//displayString
+													null, 							//contextInformation
+													null,							//additionalProposalInfo 
+													100,							//relevance
+													true));							//updateReplacementLengthOnValidate
+					
+				}
+			}
+			// proposal to add value for asset:,asset:context:,context:
+			// e.g.${asset:context:static/css/k-structure.css
+			for(String assetBinding:assetBindins){
+				if(assetBinding.toLowerCase().equals(alreadyTypedAsset.toLowerCase().replace("${", ""))){// add filtering
+					int offset = context.getInvocationOffset();
+					int replacementLength = getAttributeReplacementLength(wholeDocument, context.getInvocationOffset());
+					
+					for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssets()){
+						String	toBeInserted = assetModel.getPath();
+						proposals.add(
+								new CustomCompletionProposal(toBeInserted, 					//replacementString 
+															offset, 						//replacementOffset
+															replacementLength,				//replacementLength
+															toBeInserted.length(),			//cursorPosition
+															imagePE, 						//image
+															assetModel.getName(), 			//displayString
+															null, 							//contextInformation
+															null,							//additionalProposalInfo 
+															100,							//relevance
+															true));							//updateReplacementLengthOnValidate
+					}
+				}
+			}
+			//------------ PART-1 proposal for asset ends ---------------------
 			
 			//------------ PART-1 field properties: with subsequent sub-properties after '.' or '.?' ----------------------
 			
@@ -351,4 +407,3 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 		return null;
 	}
 }
-	
