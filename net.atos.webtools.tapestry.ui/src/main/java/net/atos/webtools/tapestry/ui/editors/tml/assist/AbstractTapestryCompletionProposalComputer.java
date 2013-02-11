@@ -78,7 +78,7 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 				&& currentChar != '<' 
 				&& currentChar != '>' 
 				&& currentChar != '}'
-                                && currentChar != '('){
+                && currentChar != '('){
 			sb.insert(0, currentChar);
 			index --;
 			currentChar = wholeDocument.charAt(index);
@@ -116,6 +116,38 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 		
 		return replacementLength;
 	}
+	
+	/**
+	 * 
+	 * 
+	 * @param wholeDocument
+	 * @param index
+	 * @return
+	 */
+	protected int getAttributeReplacementLengthForAsset(String wholeDocument, int index) {
+		int replacementLength = 0;
+		
+		char currentChar = wholeDocument.charAt(index);
+		
+		while(currentChar != '.'
+				&& currentChar != '}'
+				&& currentChar != ','
+				&& currentChar != '>'
+				&& currentChar != '"'
+				&& currentChar != ')'
+				&& ! Character.isWhitespace(currentChar)) {
+			index ++;
+			replacementLength ++;
+			if(index == wholeDocument.length()){
+				break;
+			}
+			currentChar = wholeDocument.charAt(index);
+			
+		}
+		
+		return replacementLength;
+	}
+	
 	protected boolean isAssetTagEnds(String wholeDocument, int index) {
 		char currentChar = wholeDocument.charAt(index);
 		while(Character.isWhitespace(currentChar)) {

@@ -205,7 +205,8 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			if(! PROP_BINDING.equals(defaultPrefix)){
 				prefix = PROP_BINDING;
 			}
-                        //------------ PART-1 proposal for asset---------------------
+            
+			//------------ PART-1 proposal for asset---------------------
 			//Proposal for asset:,asset:context:,context: for attribute value
 			
 			String alreadyTypedAsset = getTypedBefore(wholeDocument, context.getInvocationOffset());
@@ -214,7 +215,7 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			for(String assetBinding:assetBindins){
 				if(assetBinding.toLowerCase().startsWith(alreadyTypedAsset.toLowerCase().replace("${", ""))){
 					int offset = context.getInvocationOffset() - alreadyTypedAsset.length();
-					int replacementLength = getAttributeReplacementLength(wholeDocument, context.getInvocationOffset()) + alreadyTypedAsset.length();
+					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset()) + alreadyTypedAsset.length();
 					String toBeInserted = null;
 					if(!isAssetTagEnds(wholeDocument, context.getInvocationOffset())){
 						toBeInserted = "${"+assetBinding +"}";
@@ -240,7 +241,7 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			for(String assetBinding:assetBindins){
 				if(assetBinding.toLowerCase().equals(alreadyTypedAsset.toLowerCase().replace("${", ""))){// add filtering
 					int offset = context.getInvocationOffset();
-					int replacementLength = getAttributeReplacementLength(wholeDocument, context.getInvocationOffset());
+					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset());
 					
 					for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssets()){
 						String	toBeInserted = assetModel.getPath();
