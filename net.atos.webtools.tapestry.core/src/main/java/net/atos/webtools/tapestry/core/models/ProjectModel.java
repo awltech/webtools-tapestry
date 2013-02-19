@@ -105,16 +105,25 @@ public class ProjectModel {
 
 	private Map<String, ServiceModel> servicesByFullName = new ConcurrentHashMap<String, ServiceModel>();
 	
-        /**
+    /**
 	 * List of the assets dynamically found.
 	 * 
 	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
 	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
 	 */
-	private Collection<AssetModel> aasets = new ConcurrentLinkedQueue<AssetModel>();
+	private Collection<AssetModel> assets = new ConcurrentLinkedQueue<AssetModel>();
 	
 	private Map<String,AssetModel> assetsByFullName = new ConcurrentHashMap<String, AssetModel>();
-  	/**
+  	
+	/**
+	 * List of the assets dynamically found.
+	 * 
+	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
+	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
+	 */
+	private Collection<AssetModel> assetsFromClassPath = new ConcurrentLinkedQueue<AssetModel>();
+	
+	/**
 	 * Technical property, used to avoid reloading the model too often
 	 * 
 	 * @see TapestryCore
@@ -230,14 +239,14 @@ public class ProjectModel {
 		return initDate;
 	}
 
-        void addAsset(AssetModel asset){
+    void addAsset(AssetModel asset){
 		if(asset != null){
-			aasets.add(asset);
+			assets.add(asset);
 			assetsByFullName.put(asset.getName(), asset);
 		}
 	}
 	public Collection<AssetModel> getAssets() {
-		return aasets;
+		return assets;
 	}
 	
 	public AssetModel getAsset(String fullName) {
@@ -245,6 +254,15 @@ public class ProjectModel {
 			return assetsByFullName.get(fullName.toLowerCase().trim());
 		}
 		return null;
+	}
+	
+	void addAssetsFromClassPath(AssetModel asset){
+		if(asset != null){
+			assetsFromClassPath.add(asset);
+		}
+	}
+	public Collection<AssetModel> getAssetsFromClassPath() {
+		return assetsFromClassPath;
 	}
 
 	/**

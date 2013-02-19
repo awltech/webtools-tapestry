@@ -242,23 +242,42 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 				if(assetBinding.toLowerCase().equals(alreadyTypedAsset.toLowerCase().replace("${", ""))){// add filtering
 					int offset = context.getInvocationOffset();
 					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset());
-					
-					for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssets()){
-						String	toBeInserted = assetModel.getPath();
-						proposals.add(
-								new CustomCompletionProposal(toBeInserted, 					//replacementString 
-															offset, 						//replacementOffset
-															replacementLength,				//replacementLength
-															toBeInserted.length(),			//cursorPosition
-															imagePE, 						//image
-															assetModel.getName(), 			//displayString
-															null, 							//contextInformation
-															null,							//additionalProposalInfo 
-															100,							//relevance
-															true));							//updateReplacementLengthOnValidate
+					//propose all the assets from class path 
+					if(assetBinding.equals(ASSET_CLASSPATH_BINDING)){
+						for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssetsFromClassPath()){
+							String	toBeInserted = assetModel.getPath();
+							proposals.add(
+									new CustomCompletionProposal(toBeInserted, 					//replacementString 
+																offset, 						//replacementOffset
+																replacementLength,				//replacementLength
+																toBeInserted.length(),			//cursorPosition
+																imagePE, 						//image
+																assetModel.getName(), 			//displayString
+																null, 							//contextInformation
+																null,							//additionalProposalInfo 
+																100,							//relevance
+																true));							//updateReplacementLengthOnValidate
+						}
+					} else {
+						//propose all the assets from context path
+						for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssets()){
+							String	toBeInserted = assetModel.getPath();
+							proposals.add(
+									new CustomCompletionProposal(toBeInserted, 					//replacementString 
+																offset, 						//replacementOffset
+																replacementLength,				//replacementLength
+																toBeInserted.length(),			//cursorPosition
+																imagePE, 						//image
+																assetModel.getName(), 			//displayString
+																null, 							//contextInformation
+																null,							//additionalProposalInfo 
+																100,							//relevance
+																true));							//updateReplacementLengthOnValidate
+						}
 					}
 				}
 			}
+			
 			//------------ PART-1 proposal for asset ends ---------------------
 			
 			//------------ PART-1 field properties: with subsequent sub-properties after '.' or '.?' ----------------------

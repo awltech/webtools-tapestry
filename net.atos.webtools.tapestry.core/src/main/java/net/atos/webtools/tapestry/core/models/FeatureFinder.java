@@ -75,6 +75,8 @@ public class FeatureFinder extends Job{
 	private static final String CONTRIBUTE_COMPONENT_CLASS_RESOLVER = "contributeComponentClassResolver";
 	private static final String FILE_PATTERN = 
             "((.*?)+(\\.(?i)(java|tml|properties|xml|manifest|class))$)";
+	private static final Pattern pattern = Pattern.compile(FILE_PATTERN);
+	
 	private ProjectModel projectModel;
 	
 	/**
@@ -154,7 +156,7 @@ public class FeatureFinder extends Job{
 				
 				//---------- STEP-2: look in sources for custom components ------------
 				else {
-					loadContextAssets(iPackageFragmentRoot);
+					loadAssets(iPackageFragmentRoot);
 					//STEP-2-A: sources from the project itself:
 					if(iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()){
 						if(projectModel.getAppPackage() != null){
@@ -189,8 +191,16 @@ public class FeatureFinder extends Job{
 		return new Status(IStatus.OK, TapestryCore.PLUGIN_ID, Messages.JOB_DONE);
 	}
 	
-        private void loadContextAssets(IPackageFragmentRoot iPackageFragmentRoot) {
-		if(iPackageFragmentRoot != null && iPackageFragmentRoot.exists() && iPackageFragmentRoot.getPath().toString().contains("webapp")){
+	/**
+   	 * Loads all the assets from class path(src/main/resources) and context(/webapp) to Project model.
+   	 *  
+   	
+   	 * @param iPackageFragmentRoot <code>org.eclipse.jdt.core.IPackageFragmentRoot</code>: 
+   	 * 										PackageFragmentRoot from which assets will loaded into the Project model  
+   	 * 
+   	 */
+    private void loadAssets(IPackageFragmentRoot iPackageFragmentRoot) {
+		if(iPackageFragmentRoot != null && iPackageFragmentRoot.exists()){
 			Object[] resources=null; 
 			try {
 				resources = iPackageFragmentRoot.getNonJavaResources();
@@ -199,49 +209,78 @@ public class FeatureFinder extends Job{
 						+ " : " + iPackageFragmentRoot.getJavaProject().getElementName(), e);
 				return;
 			}
-			
-			Pattern pattern = Pattern.compile(FILE_PATTERN);
 			for(Object asset:resources){
-				if(IFolder.class.isInstance(asset)){
-					IFolder folder = (IFolder)asset;
-					if(!("WEB-INF".equals(folder.getName()))){
-						findAssetsFromFolder(folder,iPackageFragmentRoot);
-					}else{
-						continue;
-					}
-				}else if(IFile.class.isInstance(asset)){
-					IFile iFile =(IFile)asset;
-					Matcher matcher = pattern.matcher(iFile.getName());
-					if(!matcher.matches()){
-						projectModel.addAsset(new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1)));
-					}
+				if(iPackageFragmentRoot.getPath().toString().contains("webapp")){
+					loadAssetsFromContext(asset,iPackageFragmentRoot);
+				} else {
+					loadAssetsFromClassPath(asset,iPackageFragmentRoot);
 				}
 			}
 		}
 	}
-	
-	private void findAssetsFromFolder(IFolder folder,IPackageFragmentRoot iPackageFragmentRoot){
+    
+    /**
+   	 * Loads the asset from class path(src.main/java) to project model.
+   	 * If the provided asset is a folder then find all the static assets  present inside the folder and load them in Project model. 
+   	 * 
+   	 * @param asset: <code>Object</code>
+   	 * 					- Non Java Resource present inside the web context(IFolder/IFile).
+   	 * 
+   	 * @param iPackageFragmentRoot:<code>org.eclipse.jdt.core.IPackageFragmentRoot</code> 
+   	 * 										PackageFragmentRoot to which asset is belong 
+   	 * 
+   	 */
+    private void loadAssetsFromClassPath(Object asset,IPackageFragmentRoot iPackageFragmentRoot){
 		try {
-			List<IFolder> folders = new ArrayList<IFolder>();
-			Pattern pattern = Pattern.compile(FILE_PATTERN);
-			for(IResource iResource:folder.members()){
-				if(IFolder.class.isInstance(iResource)){
-					folders.add((IFolder)iResource);
-				}else if(IFile.class.isInstance(iResource)){
-					IFile iFile=(IFile)iResource;
-					Matcher matcher = pattern.matcher(iFile.getName());
-					if(!matcher.matches()){
-						projectModel.addAsset(new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1)));
-					}
+			if(IFolder.class.isInstance(asset)){
+				IFolder folder = (IFolder)asset;
+				for(IResource iResource:folder.members()){
+					loadAssetsFromClassPath(iResource,iPackageFragmentRoot);
+				}
+			}else if(IFile.class.isInstance(asset)){
+				IFile iFile =(IFile)asset;
+				Matcher matcher = pattern.matcher(iFile.getName());
+				if(iFile.getFileExtension()!= null && !matcher.matches()){
+					projectModel.addAssetsFromClassPath((new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1))));
 				}
 			}
-			for(IFolder fldr:folders){
-				findAssetsFromFolder(fldr,iPackageFragmentRoot);
-			}
-			
 		} catch (CoreException e) {
+			
 		}
-	}
+    }
+    /**
+	 * Loads the asset from web context to project model.</br>
+	 * If the provided asset is a folder then find all the static assets  present inside the folder and load them in Project model.</br> 
+	 * Ignore if the provided folder name is "WEB-INF".
+	 * 
+	 * @param asset <code>Object</code>:
+	 * 					- Non Java Resource present inside the web context(IFolder/IFile).
+	 * 
+	 * @param iPackageFragmentRoot <code>org.eclipse.jdt.core.IPackageFragmentRoot</code>: 
+	 * 										- PackageFragmentRoot to which asset is belong 
+	 * 
+	 */
+    private void loadAssetsFromContext(Object asset,IPackageFragmentRoot iPackageFragmentRoot){
+		try {
+			if(IFolder.class.isInstance(asset)){
+				IFolder folder = (IFolder)asset;
+				if(!("WEB-INF".equals(folder.getName()))){
+					for(IResource iResource:folder.members()){
+						loadAssetsFromContext(iResource,iPackageFragmentRoot);
+					}
+				}
+			}else if(IFile.class.isInstance(asset)){
+				IFile iFile =(IFile)asset;
+				Matcher matcher = pattern.matcher(iFile.getName());
+				if(iFile.getFileExtension()!= null && !matcher.matches()){
+					projectModel.addAsset((new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1))));
+				}
+			}
+		} catch (CoreException e) {
+			
+		}
+    }
+    
 	/**
 	 * 
 	 * 
