@@ -243,7 +243,7 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 					int offset = context.getInvocationOffset();
 					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset());
 					//propose all the assets from class path 
-					if(assetBinding.equals(ASSET_CLASSPATH_BINDING)){
+					if(assetBinding.equals(ASSET_CLASSPATH_BINDING)||assetBinding.equals(ASSET_BINDING)){
 						for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssetsFromClassPath()){
 							String	toBeInserted = assetModel.getPath();
 							proposals.add(
