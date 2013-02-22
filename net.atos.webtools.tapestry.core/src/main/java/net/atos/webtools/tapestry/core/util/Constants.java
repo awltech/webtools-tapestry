@@ -47,6 +47,10 @@ public class Constants {
 	public static final String MIXINS = "mixins";
 	public static final String PAGE_ATTRIBUTE = "page";
 	
+	public static final String SRC_ATTRIBUTE = "src";
+	public static final String HREF_ATTRIBUTE = "href";
+	public static final String URL_ATTRIBUTE = "url";
+	
 	//Classes:
 	public static final String JAVA_OBJECT = "java.lang.Object";
 	public static final String SLF4J_LOGGER = "org.slf4j.Logger";

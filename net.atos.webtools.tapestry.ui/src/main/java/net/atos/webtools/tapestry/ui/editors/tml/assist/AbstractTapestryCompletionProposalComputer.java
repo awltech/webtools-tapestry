@@ -159,6 +159,93 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 		}
 		return false;
 	}
+	
+	protected boolean isImageElement(String wholeDocument, int index) {
+		StringBuilder sb = new StringBuilder();
+		index --;
+		char currentChar = wholeDocument.charAt(index);
+		while(currentChar != '<'){
+			sb.insert(0, currentChar);
+			index --;
+			currentChar = wholeDocument.charAt(index);
+		}
+		return sb.toString().toLowerCase().contains("img");
+	}
+	
+	protected boolean isLinkToStyleSheetElement(String wholeDocument, int index) {
+		StringBuilder sb = new StringBuilder();
+		StringBuilder completeLinkTag = new StringBuilder();
+		index --;
+		char currentChar = wholeDocument.charAt(index);
+		while(currentChar != '<'){
+			sb.insert(0, currentChar);
+			index --;
+			currentChar = wholeDocument.charAt(index);
+		}
+		
+		if(sb.toString().toLowerCase().contains("link")){
+			index ++;
+			char currentChr = wholeDocument.charAt(index);
+			int indx=0;
+			while(currentChr != '>' && currentChr != '<' ){
+				completeLinkTag.insert(indx, currentChr);
+				index ++;
+				indx++;
+				currentChr = wholeDocument.charAt(index);
+			}
+			if(completeLinkTag.toString().toLowerCase().contains("rel")){
+				if(completeLinkTag.toString().toLowerCase().contains("stylesheet")){
+					return true;
+				}else{
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	protected boolean isStyleElement(String wholeDocument, int index) {
+		StringBuilder sb = new StringBuilder();
+		StringBuilder completeLinkTag = new StringBuilder();
+		index --;
+		char currentChar = wholeDocument.charAt(index);
+		while(currentChar != '<'&& currentChar != '@'){
+			sb.insert(0, currentChar);
+			index --;
+			currentChar = wholeDocument.charAt(index);
+		}
+		
+		if(sb.toString().toLowerCase().contains("import")){
+			index ++;
+			char currentChr = wholeDocument.charAt(index);
+			int indx=0;
+			while(currentChr != ')'){
+				completeLinkTag.insert(indx, currentChr);
+				index ++;
+				indx++;
+				currentChr = wholeDocument.charAt(index);
+			}
+			if(completeLinkTag.toString().toLowerCase().contains("url")){
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+	
+	protected boolean isScriptElement(String wholeDocument, int index) {
+		StringBuilder sb = new StringBuilder();
+		index --;
+		char currentChar = wholeDocument.charAt(index);
+		while(currentChar != '<'){
+			sb.insert(0, currentChar);
+			index --;
+			currentChar = wholeDocument.charAt(index);
+		}
+		return sb.toString().toLowerCase().contains("script");
+	}
+	
 	//***************************************************************************************
 	//
 	//							 Methods that can be implemented:

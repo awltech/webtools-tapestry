@@ -11,6 +11,8 @@ import static net.atos.webtools.tapestry.core.util.Constants.PROP_BINDING;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.atos.webtools.tapestry.core.models.JavaElement;
 import net.atos.webtools.tapestry.core.models.features.AssetModel;
@@ -40,6 +42,12 @@ import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
 public class PropertyExpressionsCompletionProposalComputer extends AbstractTapestryCompletionProposalComputer {
 	private static final String[] keywords = {"true", "false", "this", "null"};
 	
+	private static final String IMG_FILE_PATTERN =  "((.*?)+(\\.(?i)(jpg|jpeg|png|gif|bmp|tiff))$)";
+	
+	private static final String CSS_FILE_PATTERN = "((.*?)+(\\.(?i)(css))$)";
+	
+	private static final String JS_FILE_PATTERN =  "((.*?)+(\\.(?i)(js))$)";
+	
 	@Override
 	public void sessionStarted() {
 		super.sessionStarted();
@@ -60,10 +68,10 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			String alreadyTyped = getTypedBefore(wholeDocument, context.getInvocationOffset());
 			
 			//------------ PART-1 assets ----------------------
-			if(alreadyTyped != null && alreadyTyped.toLowerCase().startsWith(ASSET_BINDING + ":")){
+			/*if(alreadyTyped != null && alreadyTyped.toLowerCase().startsWith(ASSET_BINDING + ":")){
 				//TODO: implement asset proposals
 				return;
-			}
+			}*/
 			//------------ PART-2 field properties: with subsequent sub-properties after '.' or '.?' ----------------------
 			
 			//If the property expression is "${person.adress.z", it will have {"person", "adress", "z"}:
@@ -212,28 +220,32 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			String alreadyTypedAsset = getTypedBefore(wholeDocument, context.getInvocationOffset());
 			String[] assetBindins = {ASSET_CONTEXT_BINDING,ASSET_CONTEXT_ONLY_BINDING,ASSET_BINDING,ASSET_CLASSPATH_BINDING}; 
 			
-			for(String assetBinding:assetBindins){
-				if(assetBinding.toLowerCase().startsWith(alreadyTypedAsset.toLowerCase().replace("${", ""))){
-					int offset = context.getInvocationOffset() - alreadyTypedAsset.length();
-					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset()) + alreadyTypedAsset.length();
-					String toBeInserted = null;
-					if(!isAssetTagEnds(wholeDocument, context.getInvocationOffset())){
-						toBeInserted = "${"+assetBinding +"}";
-					}else{
-						toBeInserted = "${"+assetBinding;
+			if(attributeName.toLowerCase().equals(Constants.SRC_ATTRIBUTE) 
+					|| attributeName.toLowerCase().equals(Constants.HREF_ATTRIBUTE) 
+					|| isStyleElement(wholeDocument, context.getInvocationOffset())){
+				for(String assetBinding:assetBindins){
+					if(assetBinding.toLowerCase().startsWith(alreadyTypedAsset.toLowerCase().replace("${", ""))){
+						int offset = context.getInvocationOffset() - alreadyTypedAsset.length();
+						int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset()) + alreadyTypedAsset.length();
+						String toBeInserted = null;
+						if(!isAssetTagEnds(wholeDocument, context.getInvocationOffset())){
+							toBeInserted = "${"+assetBinding +"}";
+						}else{
+							toBeInserted = "${"+assetBinding;
+						}
+						proposals.add(
+								new CustomCompletionProposal(toBeInserted, 				//replacementString 
+														offset, 						//replacementOffset
+														replacementLength,				//replacementLength
+														toBeInserted.length(),			//cursorPosition
+														imagePE, 						//image
+														assetBinding, 					//displayString
+														null, 							//contextInformation
+														null,							//additionalProposalInfo 
+														100,							//relevance
+														true));							//updateReplacementLengthOnValidate
+						
 					}
-					proposals.add(
-							new CustomCompletionProposal(toBeInserted, 				//replacementString 
-													offset, 						//replacementOffset
-													replacementLength,				//replacementLength
-													toBeInserted.length(),			//cursorPosition
-													imagePE, 						//image
-													assetBinding, 					//displayString
-													null, 							//contextInformation
-													null,							//additionalProposalInfo 
-													100,							//relevance
-													true));							//updateReplacementLengthOnValidate
-					
 				}
 			}
 			// proposal to add value for asset:,asset:context:,context:
@@ -242,10 +254,22 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 				if(assetBinding.toLowerCase().equals(alreadyTypedAsset.toLowerCase().replace("${", ""))){// add filtering
 					int offset = context.getInvocationOffset();
 					int replacementLength = getAttributeReplacementLengthForAsset(wholeDocument, context.getInvocationOffset());
+					Pattern pattern = null;
+					if(isImageElement(wholeDocument, context.getInvocationOffset())){
+						pattern = Pattern.compile(IMG_FILE_PATTERN);
+					}else if(isLinkToStyleSheetElement(wholeDocument, context.getInvocationOffset())||isStyleElement(wholeDocument, context.getInvocationOffset())){
+						pattern = Pattern.compile(CSS_FILE_PATTERN);
+					}else if(isScriptElement(wholeDocument, context.getInvocationOffset())){
+						pattern = Pattern.compile(JS_FILE_PATTERN);
+					}
 					//propose all the assets from class path 
 					if(assetBinding.equals(ASSET_CLASSPATH_BINDING)||assetBinding.equals(ASSET_BINDING)){
 						for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssetsFromClassPath()){
 							String	toBeInserted = assetModel.getPath();
+							Matcher matcher = pattern.matcher(assetModel.getName());
+							if(!matcher.matches()){
+								continue;
+							}
 							proposals.add(
 									new CustomCompletionProposal(toBeInserted, 					//replacementString 
 																offset, 						//replacementOffset
@@ -262,6 +286,10 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 						//propose all the assets from context path
 						for(AssetModel assetModel: tapestryFeatureModel.getProjectModel().getAssets()){
 							String	toBeInserted = assetModel.getPath();
+							Matcher matcher = pattern.matcher(assetModel.getName());
+							if(!matcher.matches()){
+								continue;
+							}
 							proposals.add(
 									new CustomCompletionProposal(toBeInserted, 					//replacementString 
 																offset, 						//replacementOffset
