@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-	<feature url="features/net.atos.webtools.tapestry_1.0.0.final.jar"
-		id="net.atos.webtools.tapestry" version="1.0.0.final" />
+	<feature url="features/net.atos.webtools.tapestry_1.0.0.qualifier.jar"
+		id="net.atos.webtools.tapestry" version="1.0.0.qualifier" />
 </site>
