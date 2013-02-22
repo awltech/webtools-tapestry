@@ -38,6 +38,7 @@ public class Constants {
 	public static final String PROP_BINDING = "prop:";
 	public static final String ASSET_BINDING = "asset:";
 	public static final String ASSET_CONTEXT_BINDING = "asset:context:";
+        public static final String ASSET_CONTEXT_ONLY_BINDING = "context:";
 	public static final String ASSET_CLASSPATH_BINDING = "asset:classpath:";
 	
 	//XML attributes

@@ -18,8 +18,10 @@ import org.eclipse.ui.internal.Workbench;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 import org.eclipse.wst.sse.ui.contentassist.CompletionProposalInvocationContext;
+import org.eclipse.wst.sse.ui.internal.contentassist.ContentAssistUtils;
 import org.eclipse.wst.sse.ui.internal.contentassist.CustomCompletionProposal;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
+import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 import org.eclipse.wst.xml.ui.internal.contentassist.AbstractXMLCompletionProposalComputer;
 import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
 
@@ -75,7 +77,8 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 				&& currentChar != '=' 
 				&& currentChar != '<' 
 				&& currentChar != '>' 
-				&& currentChar != '}'){
+				&& currentChar != '}'
+                && currentChar != '('){
 			sb.insert(0, currentChar);
 			index --;
 			currentChar = wholeDocument.charAt(index);
@@ -114,6 +117,48 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 		return replacementLength;
 	}
 	
+	/**
+	 * 
+	 * 
+	 * @param wholeDocument
+	 * @param index
+	 * @return
+	 */
+	protected int getAttributeReplacementLengthForAsset(String wholeDocument, int index) {
+		int replacementLength = 0;
+		
+		char currentChar = wholeDocument.charAt(index);
+		
+		while(currentChar != '.'
+				&& currentChar != '}'
+				&& currentChar != ','
+				&& currentChar != '>'
+				&& currentChar != '"'
+				&& currentChar != ')'
+				&& ! Character.isWhitespace(currentChar)) {
+			index ++;
+			replacementLength ++;
+			if(index == wholeDocument.length()){
+				break;
+			}
+			currentChar = wholeDocument.charAt(index);
+			
+		}
+		
+		return replacementLength;
+	}
+	
+	protected boolean isAssetTagEnds(String wholeDocument, int index) {
+		char currentChar = wholeDocument.charAt(index);
+		while(Character.isWhitespace(currentChar)) {
+			index ++;
+			currentChar = wholeDocument.charAt(index);
+		}
+		if(currentChar == '}'){
+			return true;
+		}
+		return false;
+	}
 	//***************************************************************************************
 	//
 	//							 Methods that can be implemented:
@@ -282,4 +327,25 @@ public abstract class AbstractTapestryCompletionProposalComputer extends Abstrac
 			CompletionProposalInvocationContext context) {
 		
 	}
+    
+	@Override
+    protected ContentAssistRequest computeCompletionProposals(String matchString, ITextRegion completionRegion,
+                IDOMNode treeNode, IDOMNode xmlnode, CompletionProposalInvocationContext context) {
+
+          int documentPosition = context.getInvocationOffset();
+          String regionType = completionRegion.getType();
+          IStructuredDocumentRegion sdRegion = ContentAssistUtils.getStructuredDocumentRegion(context.getViewer(),
+                      documentPosition);
+          if (regionType == DOMRegionContext.BLOCK_TEXT) {
+                if ("style".equals(xmlnode.getNodeName())) {
+                      IDOMNode actualNode = (IDOMNode) xmlnode.getModel().getIndexedRegion(
+                                  sdRegion.getStartOffset(completionRegion));
+                      ContentAssistRequest contentAssistRequest = new ContentAssistRequest(actualNode, actualNode, sdRegion,
+                                  completionRegion, documentPosition, 0, matchString);
+                      addAttributeValueProposals(contentAssistRequest, context);
+                      return contentAssistRequest;
+                }
+          }
+          return super.computeCompletionProposals(matchString, completionRegion, treeNode, xmlnode, context);
+    }
 }

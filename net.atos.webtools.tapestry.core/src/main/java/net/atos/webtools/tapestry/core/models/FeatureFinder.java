@@ -14,8 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.atos.webtools.tapestry.core.TapestryCore;
+import net.atos.webtools.tapestry.core.models.features.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.MixinModel;
 import net.atos.webtools.tapestry.core.models.features.PageModel;
@@ -28,6 +31,7 @@ import net.atos.webtools.tapestry.core.util.Messages;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -51,6 +55,7 @@ import org.eclipse.jdt.internal.core.JarEntryDirectory;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.util.Util;
 /**
  * This {@link Job} parses all the project to found Tapestry "features" 
  * (components, or pages, or mixins...) and to add them to the {@link ProjectModel}
@@ -68,6 +73,9 @@ public class FeatureFinder extends Job{
 	private static final String GET_ROOT_PACKAGE = "getRootPackage";
 	private static final String GET_PATH_PREFIX = "getPathPrefix";
 	private static final String CONTRIBUTE_COMPONENT_CLASS_RESOLVER = "contributeComponentClassResolver";
+	private static final String FILE_PATTERN = 
+            "((.*?)+(\\.(?i)(java|tml|properties|xml|manifest|class))$)";
+	private static final Pattern pattern = Pattern.compile(FILE_PATTERN);
 	
 	private ProjectModel projectModel;
 	
@@ -148,7 +156,7 @@ public class FeatureFinder extends Job{
 				
 				//---------- STEP-2: look in sources for custom components ------------
 				else {
-					
+					loadAssets(iPackageFragmentRoot);
 					//STEP-2-A: sources from the project itself:
 					if(iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()){
 						if(projectModel.getAppPackage() != null){
@@ -183,6 +191,96 @@ public class FeatureFinder extends Job{
 		return new Status(IStatus.OK, TapestryCore.PLUGIN_ID, Messages.JOB_DONE);
 	}
 	
+	/**
+   	 * Loads all the assets from class path(src/main/resources) and context(/webapp) to Project model.
+   	 *  
+   	
+   	 * @param iPackageFragmentRoot <code>org.eclipse.jdt.core.IPackageFragmentRoot</code>: 
+   	 * 										PackageFragmentRoot from which assets will loaded into the Project model  
+   	 * 
+   	 */
+    private void loadAssets(IPackageFragmentRoot iPackageFragmentRoot) {
+		if(iPackageFragmentRoot != null && iPackageFragmentRoot.exists()){
+			Object[] resources=null; 
+			try {
+				resources = iPackageFragmentRoot.getNonJavaResources();
+			} catch (JavaModelException e) {
+				TapestryCore.logWarning(ErrorMessages.CAN_T_LOAD_TAPESTRY_ASSETS_FROM + iPackageFragmentRoot.getElementName() 
+						+ " : " + iPackageFragmentRoot.getJavaProject().getElementName(), e);
+				return;
+			}
+			for(Object asset:resources){
+				if(iPackageFragmentRoot.getPath().toString().contains("webapp")){
+					loadAssetsFromContext(asset,iPackageFragmentRoot);
+				} else {
+					loadAssetsFromClassPath(asset,iPackageFragmentRoot);
+				}
+			}
+		}
+	}
+    
+    /**
+   	 * Loads the asset from class path(src.main/java) to project model.
+   	 * If the provided asset is a folder then find all the static assets  present inside the folder and load them in Project model. 
+   	 * 
+   	 * @param asset: <code>Object</code>
+   	 * 					- Non Java Resource present inside the web context(IFolder/IFile).
+   	 * 
+   	 * @param iPackageFragmentRoot:<code>org.eclipse.jdt.core.IPackageFragmentRoot</code> 
+   	 * 										PackageFragmentRoot to which asset is belong 
+   	 * 
+   	 */
+    private void loadAssetsFromClassPath(Object asset,IPackageFragmentRoot iPackageFragmentRoot){
+		try {
+			if(IFolder.class.isInstance(asset)){
+				IFolder folder = (IFolder)asset;
+				for(IResource iResource:folder.members()){
+					loadAssetsFromClassPath(iResource,iPackageFragmentRoot);
+				}
+			}else if(IFile.class.isInstance(asset)){
+				IFile iFile =(IFile)asset;
+				Matcher matcher = pattern.matcher(iFile.getName());
+				if(iFile.getFileExtension()!= null && !matcher.matches()){
+					projectModel.addAssetsFromClassPath((new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1))));
+				}
+			}
+		} catch (CoreException e) {
+			
+		}
+    }
+    /**
+	 * Loads the asset from web context to project model.</br>
+	 * If the provided asset is a folder then find all the static assets  present inside the folder and load them in Project model.</br> 
+	 * Ignore if the provided folder name is "WEB-INF".
+	 * 
+	 * @param asset <code>Object</code>:
+	 * 					- Non Java Resource present inside the web context(IFolder/IFile).
+	 * 
+	 * @param iPackageFragmentRoot <code>org.eclipse.jdt.core.IPackageFragmentRoot</code>: 
+	 * 										- PackageFragmentRoot to which asset is belong 
+	 * 
+	 */
+    private void loadAssetsFromContext(Object asset,IPackageFragmentRoot iPackageFragmentRoot){
+		try {
+			if(IFolder.class.isInstance(asset)){
+				IFolder folder = (IFolder)asset;
+				if(!("WEB-INF".equals(folder.getName()))){
+					for(IResource iResource:folder.members()){
+						loadAssetsFromContext(iResource,iPackageFragmentRoot);
+					}
+				}
+			}else if(IFile.class.isInstance(asset)){
+				IFile iFile =(IFile)asset;
+				Matcher matcher = pattern.matcher(iFile.getName());
+				if(iFile.getFileExtension()!= null && !matcher.matches()){
+					projectModel.addAsset((new AssetModel(iFile.getName(),Util.relativePath(iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount()-1))));
+				}
+			}
+		} catch (CoreException e) {
+			
+		}
+    }
+    
 	/**
 	 * 
 	 * 
