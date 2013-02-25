@@ -200,7 +200,7 @@ public class PropertyExpressionsCompletionProposalComputer extends AbstractTapes
 			String alreadyTyped = getTypedBefore(wholeDocument, context.getInvocationOffset());
 			
 			//if there's a Tapestry prefix binding, we remove it: 
-			if(alreadyTyped.contains(":")){
+			if(!(alreadyTyped.contains("asset:")||alreadyTyped.contains("context:"))&& (alreadyTyped.contains(":"))){
 				alreadyTyped = alreadyTyped.substring(alreadyTyped.indexOf(':') + 1);
 			}
 			
