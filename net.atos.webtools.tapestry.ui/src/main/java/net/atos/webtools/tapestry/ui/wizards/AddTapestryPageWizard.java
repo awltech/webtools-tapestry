@@ -1,8 +1,5 @@
 package net.atos.webtools.tapestry.ui.wizards;
 
-
-
-
 /**
  * Tapestry page creation wizard
  * 

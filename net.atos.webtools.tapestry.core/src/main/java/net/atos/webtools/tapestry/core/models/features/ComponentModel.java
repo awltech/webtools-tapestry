@@ -2,6 +2,7 @@ package net.atos.webtools.tapestry.core.models.features;
 
 import net.atos.webtools.tapestry.core.models.ProjectModel;
 import net.atos.webtools.tapestry.core.util.Constants;
+import net.atos.webtools.tapestry.core.util.InvisibleInstrumentation;
 
 import org.eclipse.jdt.core.IType;
 
@@ -14,6 +15,17 @@ import org.eclipse.jdt.core.IType;
  *
  */
 public class ComponentModel extends AbstractParameteredFeatureModel{
+	
+	
+	/**
+	 * HTML replacement element (Tapestry invisible instrumentation). 
+	 */
+	private String htmlElement = null;
+	
+	public String getHtmlElement() {
+		return this.htmlElement;
+	}
+	
 	/**
 	 * 
 	 * @param prefix
@@ -24,6 +36,8 @@ public class ComponentModel extends AbstractParameteredFeatureModel{
 	 */
 	public ComponentModel(String prefix, IType type, ProjectModel projectModel, String source, String subPackage) {
 		super(prefix, type, projectModel, source, subPackage);
+		
+		this.htmlElement = InvisibleInstrumentation.getHTMLComponent(name);
 	}
 	
 	/**
@@ -45,6 +59,8 @@ public class ComponentModel extends AbstractParameteredFeatureModel{
 		this.source = source;
 		
 		this.subPackage = "";
+		
+		this.htmlElement = InvisibleInstrumentation.getHTMLComponent(name);
 	}
 	
 }

@@ -12,11 +12,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.Manifest;
 
 import net.atos.webtools.tapestry.core.TapestryCore;
-import net.atos.webtools.tapestry.core.models.features.AssetModel;
+import net.atos.webtools.tapestry.core.models.assets.AssetFinder;
+import net.atos.webtools.tapestry.core.models.assets.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.MixinModel;
 import net.atos.webtools.tapestry.core.models.features.PageModel;
 import net.atos.webtools.tapestry.core.models.features.ServiceModel;
+import net.atos.webtools.tapestry.core.models.features.ValidatorModel;
 import net.atos.webtools.tapestry.core.util.Constants;
 import net.atos.webtools.tapestry.core.util.ErrorMessages;
 import net.atos.webtools.tapestry.core.util.Messages;
@@ -77,9 +79,6 @@ public class ProjectModel {
 	
 	/**
 	 * List of the mixins dynamically found.
-	 * 
-	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
-	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
 	 */
 	private Collection<MixinModel> mixins = new ConcurrentLinkedQueue<MixinModel>();
 	
@@ -87,9 +86,6 @@ public class ProjectModel {
 	
 	/**
 	 * List of the pages dynamically found.
-	 * 
-	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
-	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
 	 */
 	private Collection<PageModel> pages = new ConcurrentLinkedQueue<PageModel>();
 	
@@ -97,31 +93,30 @@ public class ProjectModel {
 	
 	/**
 	 * List of the services dynamically found.
-	 * 
-	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
-	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
 	 */
 	private Collection<ServiceModel> services = new ConcurrentLinkedQueue<ServiceModel>();
 
 	private Map<String, ServiceModel> servicesByFullName = new ConcurrentHashMap<String, ServiceModel>();
 	
-    /**
-	 * List of the assets dynamically found.
-	 * 
-	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
-	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
-	 */
-	private Collection<AssetModel> assets = new ConcurrentLinkedQueue<AssetModel>();
-	
-	private Map<String,AssetModel> assetsByFullName = new ConcurrentHashMap<String, AssetModel>();
-  	
 	/**
-	 * List of the assets dynamically found.
-	 * 
-	 * A {@link ConcurrentLinkedQueue} is used internally to ensure it is thread safe 
-	 * (in case Ctrl-space is pressed while this Collection is still being filled by the {@link FeatureFinder} Job)
+	 * List of the validators dynamically found.
 	 */
-	private Collection<AssetModel> assetsFromClassPath = new ConcurrentLinkedQueue<AssetModel>();
+	private Collection<ValidatorModel> validators = new ConcurrentLinkedQueue<ValidatorModel>();
+	
+	/**
+	 * List of the images dynamically found.
+	 */
+	private Collection<AssetModel> images = new ConcurrentLinkedQueue<AssetModel>();
+
+	/**
+	 * List of the stylesheets dynamically found.
+	 */
+	private Collection<AssetModel> stylesheets = new ConcurrentLinkedQueue<AssetModel>();
+
+	/**
+	 * List of the scripts dynamically found.
+	 */
+	private Collection<AssetModel> scripts = new ConcurrentLinkedQueue<AssetModel>();
 	
 	/**
 	 * Technical property, used to avoid reloading the model too often
@@ -234,36 +229,52 @@ public class ProjectModel {
 		}
 		return null;
 	}
+	
+	public void addValidator(ValidatorModel validator) {
+		if (validator != null) {
+			validators.add(validator);
+		}
+	}
+	
+	public Collection<ValidatorModel> getValidators() {
+		return validators;
+	}
+	
+	public void addImage(AssetModel image) {
+		if (image != null && !images.contains(image)) {
+			images.add(image);
+		}
+	}
+	
+	public Collection<AssetModel> getImages() {
+		return images;
+	}
+	
+	
+	public void addStylesheet(AssetModel stylesheet) {
+		if (stylesheet != null && !stylesheets.contains(stylesheet)) {
+			stylesheets.add(stylesheet);
+		}
+	}
+	
+	public Collection<AssetModel> getStylesheets() {
+		return stylesheets;
+	}
+	
+	public void addScript(AssetModel script) {
+		if (script != null && !images.contains(script)) {
+			scripts.add(script);
+		}
+	}
+	
+	public Collection<AssetModel> getScripts() {
+		return scripts;
+	}
 
 	public Date getInitDate() {
 		return initDate;
 	}
 
-    void addAsset(AssetModel asset){
-		if(asset != null){
-			assets.add(asset);
-			assetsByFullName.put(asset.getName(), asset);
-		}
-	}
-	public Collection<AssetModel> getAssets() {
-		return assets;
-	}
-	
-	public AssetModel getAsset(String fullName) {
-		if(fullName != null){
-			return assetsByFullName.get(fullName.toLowerCase().trim());
-		}
-		return null;
-	}
-	
-	void addAssetsFromClassPath(AssetModel asset){
-		if(asset != null){
-			assetsFromClassPath.add(asset);
-		}
-	}
-	public Collection<AssetModel> getAssetsFromClassPath() {
-		return assetsFromClassPath;
-	}
 
 	/**
 	 * Constructs asynchronously the project model: only the {@link JavaProject} is set directly, 
@@ -372,5 +383,13 @@ public class ProjectModel {
 		//---- Searches asynchronously for other components in the classpath ----
 		FeatureFinder featureFinder = new FeatureFinder(this);
 		featureFinder.schedule();
+	}
+	
+	/**
+	 * Asynchronously launches a job which will find all assets (css/js/images) in the project.
+	 */
+	public void loadAssets() {
+		AssetFinder assetFinder = new AssetFinder(this);
+		assetFinder.schedule();
 	}
 }

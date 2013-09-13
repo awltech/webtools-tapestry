@@ -9,6 +9,7 @@ import net.atos.webtools.tapestry.core.models.FileType;
 import net.atos.webtools.tapestry.ui.TapestryUI;
 import net.atos.webtools.tapestry.ui.editors.java.ClassEditor;
 import net.atos.webtools.tapestry.ui.editors.java.JavaEditor;
+import net.atos.webtools.tapestry.ui.editors.preview.PreviewEditor;
 import net.atos.webtools.tapestry.ui.editors.tml.TmlEditor;
 import net.atos.webtools.tapestry.ui.util.UIErrorMessages;
 import net.atos.webtools.tapestry.ui.util.UIMessages;
@@ -92,6 +93,7 @@ public class TapestryMultiPageEditor extends MultiPageEditorPart
 	
 	private TextEditor tmlEditor;
 	private org.eclipse.jdt.internal.ui.javaeditor.JavaEditor javaEditor;
+	private PreviewEditor previewEditor;
 	
 	private IStorage storage;
 	private IClassFile openedClassFile;
@@ -147,7 +149,7 @@ public class TapestryMultiPageEditor extends MultiPageEditorPart
 			throw new PartInitException(UIErrorMessages.INVALID_INPUT_MUST_BE_I_STORAGE_EDITOR_INPUT);
 		}
 		
-		if(storage != null){
+		if (storage != null) {
 			tapestryFeatureModel = new EditedFeatureModel(storage, false);
 		}
 		else if(openedClassFile != null){
@@ -200,6 +202,7 @@ public class TapestryMultiPageEditor extends MultiPageEditorPart
 	protected void createPages() {
 		createTmlEditorPage();
 		createJavaEditorPage();
+		createPreviewPage();
 		if(tmlEditor != null){
 			IDocumentProvider tmlDocumentProvider= tmlEditor.getDocumentProvider();
 			tmlDocumentProvider.addElementStateListener(this);
@@ -210,6 +213,15 @@ public class TapestryMultiPageEditor extends MultiPageEditorPart
 		}
 		
 		setActivePage(tapestryFeatureModel.getInitialType().getRank());
+	}
+	
+	/**
+	 * Creates page 0 of the multi-page tmlEditor,
+	 * which contains preview editor.
+	 */
+	protected void createPreviewPage() {
+		previewEditor = new PreviewEditor();
+		//addPage(2, previewEditor);
 	}
 
 
@@ -274,6 +286,7 @@ public class TapestryMultiPageEditor extends MultiPageEditorPart
 		}
 		setPageText(JAVA.getRank(), UIMessages.JAVA_TAB_LABEL);
 	}
+	
 	/**
 	 * When a tml/java file is opened, and the corresponding java/tml file is not found,
 	 * We replace the editor with a composite, with an error message 

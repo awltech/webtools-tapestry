@@ -190,8 +190,25 @@
     </category>
     <wizard
           category="net.atos.webtools.tapestry.ui.wizard-category"
-          class="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard"
+          class="net.atos.webtools.tapestry.ui.wizards.AddTapestryProjectWizard"
           icon="/icons/tapestry.gif"
+          id="net.atos.webtools.tapestry.ui.wizards.AddTapestryProjectWizard"
+          name="%net.atos.webtools.tapestry.ui.wizard-newproject"
+          project="true">
+       <description>
+          %net.atos.webtools.tapestry.ui.wizard-newproject-description
+       </description>
+       <selection
+             class="org.eclipse.core.resources.IResource">
+       </selection>
+       <keywordReference
+             id="net.atos.webtools.tapestry.ui.keywords.tapestry">
+       </keywordReference>
+    </wizard>
+    <wizard
+          category="net.atos.webtools.tapestry.ui.wizard-category"
+          class="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard"
+          icon="icons/tapestry_T.gif"
           id="net.atos.webtools.tapestry.ui.wizards.AddTapestryPageWizard"
           name="%net.atos.webtools.tapestry.ui.wizard-newpage"
           project="false">
@@ -204,17 +221,11 @@
        <keywordReference
              id="net.atos.webtools.tapestry.ui.keywords.tapestry">
        </keywordReference>
-       <keywordReference
-             id="net.atos.webtools.tapestry.ui.keywords.webtools">
-       </keywordReference>
-       <keywordReference
-             id="net.atos.webtools.tapestry.ui.keywords.xa">
-       </keywordReference>
     </wizard>
     <wizard
           category="net.atos.webtools.tapestry.ui.wizard-category"
           class="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard"
-          icon="/icons/tapestry.gif"
+          icon="icons/tapestry_C.gif"
           id="net.atos.webtools.tapestry.ui.wizards.AddTapestryComponentWizard"
           name="%net.atos.webtools.tapestry.ui.wizard-component"
           project="false">
@@ -229,9 +240,6 @@
        </keywordReference>
        <keywordReference
              id="net.atos.webtools.tapestry.ui.keywords.webtools">
-       </keywordReference>
-       <keywordReference
-             id="net.atos.webtools.tapestry.ui.keywords.xa">
        </keywordReference>
     </wizard>
  </extension>

@@ -5,16 +5,22 @@ import static net.atos.webtools.tapestry.core.util.Constants.MIXINS;
 import static net.atos.webtools.tapestry.core.util.Constants.TYPE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import net.atos.webtools.tapestry.core.models.assets.AssetModel;
 import net.atos.webtools.tapestry.core.models.features.AbstractFeatureModel;
 import net.atos.webtools.tapestry.core.models.features.AbstractParameteredFeatureModel;
 import net.atos.webtools.tapestry.core.models.features.ComponentModel;
 import net.atos.webtools.tapestry.core.models.features.MixinModel;
 import net.atos.webtools.tapestry.core.models.features.PageModel;
 import net.atos.webtools.tapestry.core.models.features.Parameter;
+import net.atos.webtools.tapestry.core.models.features.ValidatorModel;
+import net.atos.webtools.tapestry.core.util.Components;
 import net.atos.webtools.tapestry.core.util.Constants;
 import net.atos.webtools.tapestry.core.util.helpers.TmlHelper;
+import net.atos.webtools.tapestry.ui.editors.proposal.ProposalHelper;
+import net.atos.webtools.tapestry.ui.editors.proposal.ProposalModel;
 import net.atos.webtools.tapestry.ui.util.UIMessages;
 
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -36,6 +42,15 @@ import org.w3c.dom.Node;
  */
 @SuppressWarnings("restriction")
 public class TagsCompletionProposalComputer extends AbstractTapestryCompletionProposalComputer {
+	
+	/**
+	 * Removes the namespace from a component name.
+	 */
+	protected String removeNamespace(String compName) {
+		int nameSpaceCharIndex = compName.indexOf(":");
+		return nameSpaceCharIndex > 0 ? compName.substring(nameSpaceCharIndex + 1) : compName;
+	}
+	
 	/*---------------------------------------------------------------------------------
 	 * 
 	 *   Be careful when modifying that class:
@@ -65,24 +80,37 @@ public class TagsCompletionProposalComputer extends AbstractTapestryCompletionPr
 					toBeInsertedSB.append('<');
 				}
 				
-				toBeInsertedSB.append(compName);
+				// Do not take into account the t: while comparing the component name and the string already typed.
+				String nameToBeCompared = removeNamespace(compName);
 				
+				// Invisible instrumentation
+				String htmlElt = componentModel.getHtmlElement();
+				if (htmlElt == null) {
+					toBeInsertedSB.append(compName);
+				} else {
+					toBeInsertedSB.append(htmlElt + " " + Constants.DEFAULT_NAMESPACE + ":" + Constants.TYPE + "=\"" + nameToBeCompared + "\"");
+				}
+				
+				// Add the required parameters
 				for(Parameter requiredParam : componentModel.getMandatoryParameters()){
 					toBeInsertedSB.append(" ").append(requiredParam.getQualifiedName(t)).append("=\"\""); 
 				}
 				
-				if(isTagInsertion){
-					toBeInsertedSB.append(">");
-				}
+				// Close the html tag.
+				toBeInsertedSB.append("></" + (htmlElt == null ? compName : htmlElt) + ">");
 				
 				String toBeInserted = toBeInsertedSB.toString();
 				
-				if(toBeInserted.toLowerCase().startsWith(alreadyTyped.toLowerCase())) {
+				// Cursor position: inside the "" if there are in the inserted string.
+				int requiredParamIndex = toBeInserted.indexOf("\"\"");
+				int cursorPosition = requiredParamIndex > 0 ? requiredParamIndex + 1 :toBeInserted.indexOf(">");
+				
+				if(nameToBeCompared.toLowerCase().startsWith(alreadyTyped.toLowerCase())) {
 					proposals.add(
 							new CustomCompletionProposal(toBeInserted,					//replacementString 
 														offset, 						//replacementOffset
 														replacementLength,				//replacementLength
-														toBeInserted.length(),			//cursorPosition
+														cursorPosition,					//cursorPosition
 														imageC, 						//imageC
 														compName,						//displayString
 														null, 							//contextInformation
@@ -193,25 +221,66 @@ public class TagsCompletionProposalComputer extends AbstractTapestryCompletionPr
 			Node node = request.getNode();
 			
 			//---------- ONLY if we're in a t:type attribute ------------------
-			if(attributeName.equals(t + ":" + TYPE)){
-				for(AbstractParameteredFeatureModel feature : tapestryFeatureModel.getProjectModel().getComponents()){
+			if(attributeName.equals(t + ":" + TYPE)) {
+				for(AbstractParameteredFeatureModel feature : tapestryFeatureModel.getProjectModel().getComponents()) {
 						//updateReplacementLengthOnValidate
 					addAttributeValueProposal(feature, proposals, node, request, replacementLengthAfterCursor, startOffset, alreadyTyped);
 				}
 			}
 			//---------- ONLY if we're in a t:mixins attribute ------------------
-			else if(attributeName.equals(t + ":" + MIXINS)){
+			else if(attributeName.equals(t + ":" + MIXINS)) {
 				List<String> existingMixins = TmlHelper.getMixinTypes(node, t);
-				for(AbstractParameteredFeatureModel feature : tapestryFeatureModel.getProjectModel().getMixins()){
+				for(AbstractParameteredFeatureModel feature : tapestryFeatureModel.getProjectModel().getMixins()) {
 					if(! existingMixins.contains(feature.getName())){
 						addAttributeValueProposal(feature, proposals, node, request, replacementLengthAfterCursor, startOffset, alreadyTyped);
 					}
 				}
 			}
 			//---------- ONLY if we're in a t:type attribute ------------------
-			else if(attributeName.equals(t + ":" + Constants.PAGE_ATTRIBUTE )){
-				for(PageModel feature : tapestryFeatureModel.getProjectModel().getPages()){
+			else if(attributeName.equals(t + ":" + Constants.PAGE_ATTRIBUTE )) {
+				for(PageModel feature : tapestryFeatureModel.getProjectModel().getPages()) {
 					addAttributeValueProposal(feature, proposals, node, request, replacementLengthAfterCursor, startOffset, alreadyTyped);
+				}
+			}
+			//---------- ONLY if we are in a t:validate attribute -------------
+			else if (attributeName.equals(t + ":" + Constants.VALIDATE)) {
+				for(ValidatorModel feature : tapestryFeatureModel.getProjectModel().getValidators()) {
+					addAttributeValueProposal(feature, proposals, node, request, replacementLengthAfterCursor, startOffset, alreadyTyped);
+				}
+			}
+			//---------- ONLY if we're in a src attribute ---------------------
+			else if(attributeName.equals(Constants.SRC)) {
+				String contextBinding = Constants.BINDING_SYMBOL + Constants.ASSET_CONTEXT_BINDING;
+				String classPathBinding = Constants.BINDING_SYMBOL + Constants.ASSET_CLASSPATH_BINDING;
+				
+				if (contextBinding.equals(alreadyTyped)) {
+					String htmlElement = request.getNode().getNodeName().toLowerCase();
+					Collection<AssetModel> assets = null;
+					
+					if (htmlElement.equals(Components.IMG)) {
+						assets = tapestryFeatureModel.getProjectModel().getImages();
+					} else if (htmlElement.equals(Components.SCRIPT)) {
+						assets = tapestryFeatureModel.getProjectModel().getScripts();
+					} else if (htmlElement.equals(Components.STYLE)) {
+						assets = tapestryFeatureModel.getProjectModel().getStylesheets();
+					}
+					
+					if (assets != null) {
+						for (AssetModel asset : assets) {
+							ProposalHelper.addProposal(new ProposalModel(asset.getPath(), alreadyTyped), proposals, alreadyTyped, replacementLengthAfterCursor, startOffset);
+						}
+					}
+				} else {
+					if (contextBinding.indexOf(alreadyTyped) == 0) {
+						// Add ${asset:context:}
+						ProposalHelper.addProposal(new ProposalModel(Constants.ASSET_CONTEXT_BINDING, 
+								Constants.BINDING_SYMBOL, "}"), proposals, alreadyTyped, replacementLengthAfterCursor, startOffset);
+					}
+					if (classPathBinding.indexOf(alreadyTyped) == 0) {
+						// Add ${asset:classpath:}
+						ProposalHelper.addProposal(new ProposalModel(Constants.ASSET_CLASSPATH_BINDING, 
+								Constants.BINDING_SYMBOL, "}"), proposals, alreadyTyped, replacementLengthAfterCursor, startOffset);
+					}
 				}
 			}
 		}

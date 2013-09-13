@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: WTT core plugin
 Bundle-SymbolicName: net.atos.webtools.tapestry.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0.final
 Bundle-Activator: net.atos.webtools.tapestry.core.TapestryCore
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
@@ -10,6 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: https://github.com/awltech
 Export-Package: net.atos.webtools.tapestry.core,
  net.atos.webtools.tapestry.core.models,
+ net.atos.webtools.tapestry.core.models.assets,
  net.atos.webtools.tapestry.core.models.features,
  net.atos.webtools.tapestry.core.templates,
  net.atos.webtools.tapestry.core.templates.variables,

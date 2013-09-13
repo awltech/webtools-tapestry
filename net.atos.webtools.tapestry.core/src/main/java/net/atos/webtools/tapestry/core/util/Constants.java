@@ -33,23 +33,23 @@ public class Constants {
 	public static final String DEFAULT_NAMESPACE = "t";
 	public static final String DEFAULT_PARAM_NAMESPACE = "p";
 	
+	//tapestry binding symbol
+	public static final String BINDING_SYMBOL = "${";
+	
 	//bindings:
 	public static final String MESSAGE_BINDING = "message:";
 	public static final String PROP_BINDING = "prop:";
 	public static final String ASSET_BINDING = "asset:";
 	public static final String ASSET_CONTEXT_BINDING = "asset:context:";
-        public static final String ASSET_CONTEXT_ONLY_BINDING = "context:";
 	public static final String ASSET_CLASSPATH_BINDING = "asset:classpath:";
 	
 	//XML attributes
 	public static final String TYPE = "type";
 	public static final String ID = "id";
 	public static final String MIXINS = "mixins";
+	public static final String VALIDATE = "validate";
 	public static final String PAGE_ATTRIBUTE = "page";
-	
-	public static final String SRC_ATTRIBUTE = "src";
-	public static final String HREF_ATTRIBUTE = "href";
-	public static final String URL_ATTRIBUTE = "url";
+	public static final String SRC = "src";
 	
 	//Classes:
 	public static final String JAVA_OBJECT = "java.lang.Object";
@@ -79,6 +79,14 @@ public class Constants {
 	public static final String JAVA_FILE_EXTENSION = "java";
 	public static final String TML_FILE_EXTENSION = "tml";
 	public static final String PROPERTIES_FILE_EXTENSION = "properties";
+	public static final String JS_FILE_EXTENSION = "js";
+	public static final String CSS_FILE_EXTENSION = "css";
+	
+	//images extensions
+	public static final String JPEG_FILE_EXTENSION = "jpeg";
+	public static final String JPG_FILE_EXTENSION = "jpg";
+	public static final String PNG_FILE_EXTENSION = "png";
+	public static final String GIF_FILE_EXTENSION = "gif";
 
 	//specific files
 	public static final String META_INF = "META-INF";
@@ -100,5 +108,10 @@ public class Constants {
 	 * Default "prefix" for Tapestry features that comes from the core library:
 	 */
 	public static final String TAPESTRY_CORE = "core";
+	
+	/**
+	 * Default asset path in a tapestry project.
+	 */
+	public static final String ASSET_PATH = "src/main/webapp";
 	
 }

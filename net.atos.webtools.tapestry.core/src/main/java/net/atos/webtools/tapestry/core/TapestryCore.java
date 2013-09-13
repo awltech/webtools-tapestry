@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.atos.webtools.tapestry.core.models.FeatureFinder;
 import net.atos.webtools.tapestry.core.models.ProjectModel;
 import net.atos.webtools.tapestry.core.util.Constants;
 
@@ -31,33 +30,37 @@ public class TapestryCore extends AbstractUIPlugin {
 	 * The plug-in ID
 	 */
 	public static final String PLUGIN_ID = "net.atos.webtools.tapestry.core"; //$NON-NLS-1$
-	
+
 	/**
-	 *  The shared instance
+	 * The shared instance
 	 */
 	private static TapestryCore plugin;
-	
+
 	/**
 	 * The key to store customized code templates.
 	 */
-	public static final String CODE_TEMPLATES_KEY = PLUGIN_ID + ".custom_tml_templates";
-	
+	public static final String CODE_TEMPLATES_KEY = PLUGIN_ID
+			+ ".custom_tml_templates";
+
 	/**
 	 * The code template context type registry for the java editor.
 	 */
 	private ContextTypeRegistry tmlTemplateContextTypeRegistry;
-	
+
 	/**
 	 * The coded template store for the java editor.
 	 */
 	private TemplateStore tmlTemplateStore;
-	
+
 	/**
-	 * <p>Very short time cache implemented with HashMap, that map project name to <code>SoftReference&lt;ProjectModel&gt;&gt;</code>
+	 * <p>
+	 * Very short time cache implemented with HashMap, that map project name to
+	 * <code>SoftReference&lt;ProjectModel&gt;&gt;</code>
 	 * 
-	 * <p>In the end, 
-	 * <li>when no more editor holds reference to the ProjectModel, it can be GC, and <code>get(project).get()</code>
-	 * will return null
+	 * <p>
+	 * In the end,
+	 * <li>when no more editor holds reference to the ProjectModel, it can be
+	 * GC, and <code>get(project).get()</code> will return null
 	 * 
 	 */
 	private Map<String, SoftReference<ProjectModel>> projectModels = new HashMap<String, SoftReference<ProjectModel>>();
@@ -66,12 +69,15 @@ public class TapestryCore extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public TapestryCore() {
-//		getWorkbench().getDisplay().
+		// getWorkbench().getDisplay().
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -80,7 +86,10 @@ public class TapestryCore extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -89,14 +98,13 @@ public class TapestryCore extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static TapestryCore getDefault() {
 		return plugin;
 	}
 
-	
 	/**
 	 * log info
 	 * 
@@ -105,34 +113,37 @@ public class TapestryCore extends AbstractUIPlugin {
 	public static void logInfo(String message) {
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
 	}
-	
+
 	/**
 	 * log warning
 	 * 
 	 * @param message
 	 */
 	public static void logWarning(String message) {
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+		getDefault().getLog().log(
+				new Status(IStatus.WARNING, PLUGIN_ID, message));
 	}
-	
+
 	/**
 	 * log warning with Exception
 	 * 
 	 * @param message
 	 */
 	public static void logWarning(String message, Throwable t) {
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, t));
+		getDefault().getLog().log(
+				new Status(IStatus.WARNING, PLUGIN_ID, message, t));
 	}
-	
+
 	/**
 	 * log error
 	 * 
 	 * @param message
 	 */
 	public static void logError(String message) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+		getDefault().getLog()
+				.log(new Status(IStatus.ERROR, PLUGIN_ID, message));
 	}
-	
+
 	/**
 	 * log error with Exception
 	 * 
@@ -140,99 +151,112 @@ public class TapestryCore extends AbstractUIPlugin {
 	 * @param t
 	 */
 	public static void logError(String message, Throwable t) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, t));
+		getDefault().getLog().log(
+				new Status(IStatus.ERROR, PLUGIN_ID, message, t));
 	}
 
 	/**
 	 * Returns the template store for the tml templates.
-	 *
+	 * 
 	 * @return the template store for the tml templates
 	 */
 	public TemplateStore getTmlTemplateStore() {
 		if (tmlTemplateStore == null) {
 			IPreferenceStore store = getPreferenceStore();
-			tmlTemplateStore = new ContributionTemplateStore(getCodeTemplateContextRegistry(), store, CODE_TEMPLATES_KEY);
+			tmlTemplateStore = new ContributionTemplateStore(
+					getCodeTemplateContextRegistry(), store, CODE_TEMPLATES_KEY);
 			try {
 				tmlTemplateStore.load();
 			} catch (IOException e) {
 				logError("codeTemplateStore could not be loaded in plugin", e);
 			}
-	
+
 			tmlTemplateStore.startListeningForPreferenceChanges();
 		}
-	
+
 		return tmlTemplateStore;
 	}
-	
-	
-	
+
 	/**
 	 * Returns the template context type registry for the code generation
 	 * templates.
-	 *
+	 * 
 	 * @return the template context type registry for the code generation
 	 *         templates
 	 */
 	public ContextTypeRegistry getCodeTemplateContextRegistry() {
 		if (tmlTemplateContextTypeRegistry == null) {
-			//Creates contextType Registry and loads ContextTypes that have been added
-			//through extension of the registry
-			tmlTemplateContextTypeRegistry = new ContributionContextTypeRegistry(Constants.REGISTRY_ID);
+			// Creates contextType Registry and loads ContextTypes that have
+			// been added
+			// through extension of the registry
+			tmlTemplateContextTypeRegistry = new ContributionContextTypeRegistry(
+					Constants.REGISTRY_ID);
 		}
 		return tmlTemplateContextTypeRegistry;
 	}
-	
+
 	/**
-	 * <p>Get the {@link ProjectModel} for a project.
+	 * <p>
+	 * Get the {@link ProjectModel} for a project.
 	 * 
-	 * <p>On most calls, it will re-process the project (launching {@link FeatureFinder} Job), 
-	 * except if the same project has been requested very recently (&lt;2 sec). 
-	 * This is mostly useful when all the opened tml editors are notified simultaneously by 
-	 * their listeners that a reload is needed  
+	 * <p>
+	 * On most calls, it will re-process the project (launching
+	 * {@link FeatureFinder} Job), except if the same project has been requested
+	 * very recently (&lt;2 sec). This is mostly useful when all the opened tml
+	 * editors are notified simultaneously by their listeners that a reload is
+	 * needed
 	 * 
-	 * <p>Inner synch prevents this method to be executed by different threads.
+	 * <p>
+	 * Inner synch prevents this method to be executed by different threads.
 	 * 
 	 * @see TapestryMultiPageEditor#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 	 * 
 	 * @param project
-	 * @param forceReload true if you need to reload the model (i.e. rebuild of project), but it will only be executed if it hasn't been loaded &lt; 2sec.
+	 * @param forceReload
+	 *            true if you need to reload the model (i.e. rebuild of
+	 *            project), but it will only be executed if it hasn't been
+	 *            loaded &lt; 1min.
 	 * @return the ProjectModel
 	 */
-	public ProjectModel getProjectModel (IProject project, boolean forceReload){
-		if(project == null){
+	public ProjectModel getProjectModel(IProject project, boolean forceReload) {
+		if (project == null) {
 			return null;
 		}
-		
+
 		ProjectModel projectModel = null;
 		boolean mustInit = false;
-		
+
 		synchronized (projectModels) {
-			//not null if it's already been in the cache
-			SoftReference<ProjectModel> softReference = projectModels.get(project.getName());
-			if(softReference != null){
-				//not null if an editor has kept a reference 
+			// not null if it's already been in the cache
+			SoftReference<ProjectModel> softReference = projectModels
+					.get(project.getName());
+			if (softReference != null) {
+				// not null if an editor has kept a reference
 				projectModel = softReference.get();
 			}
-			
-			if(projectModel != null){
+
+			if (projectModel != null) {
 				Date previousInitDate = projectModel.getInitDate();
 				Date now = new Date();
-				// > 2 second:
-				if(forceReload && (now.getTime() - previousInitDate.getTime()) > 2000){
+				// > 1 minute:
+				if (forceReload
+						&& (now.getTime() - previousInitDate.getTime()) > 60000) {
 					projectModel = null;
 				}
 			}
-			
-			if(projectModel == null){
+
+			if (projectModel == null) {
 				projectModel = new ProjectModel(project);
 				mustInit = true;
-				projectModels.put(project.getName(), new SoftReference<ProjectModel>(projectModel));
+				projectModels.put(project.getName(),
+						new SoftReference<ProjectModel>(projectModel));
 			}
 		}
-		
-		if(projectModel != null && mustInit){
+
+		if (projectModel != null && mustInit) {
 			projectModel.init();
 			projectModel.loadSubFeatures();
+			projectModel.loadAssets();
 		}
 		return projectModel;
 	}
