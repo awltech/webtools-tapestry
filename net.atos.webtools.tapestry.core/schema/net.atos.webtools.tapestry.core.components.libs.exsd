@@ -84,7 +84,7 @@ For most cases, standard Tapestry libraries are discovered automatically, but so
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         1.0.0
+         1.1.0
       </documentation>
    </annotation>
 
