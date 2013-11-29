@@ -18,8 +18,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.xml.core,
  org.eclipse.wst.xml.ui,
  org.eclipse.wst.sse.core,
- org.eclipse.wst.html.core,
- org.eclipse.wst.html.ui,
  org.eclipse.wst.validation,
  org.eclipse.core.filesystem,
  org.eclipse.ui.navigator,
@@ -27,6 +25,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  org.eclipse.jdt.debug.ui,
  org.eclipse.pde.ui,
+ com.worldline.appprofiles.wizard.ui,
  net.atos.webtools.tapestry.core;bundle-version="1.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

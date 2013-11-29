@@ -381,4 +381,41 @@
           label="tapestry">
     </keyword>
  </extension>
+ <extension
+       point="com.worldline.appprofiles.wizard.ui.profiles">
+    <configuration
+          id="net.atos.webtools.tapestry.configuration.generic"
+          name="Dependencies Configuration"
+          version="1.0.0">
+       <optionalConfigurationEntry
+             default="false"
+             id="net.atos.webtools.tapestry.profile.configurationentry.jquery"
+             message="Enable Tapestry5-JQuery Dependency"
+             variable="enableJQuery">
+       </optionalConfigurationEntry>
+    </configuration>
+    <profile
+          description="This profile creates a Web application based on the Tapestry framework."
+          id="net.atos.webtools.tapestry.profile"
+          kind="Standard"
+          name="Test Tapestry 5 Web Application">
+       <module
+             defaultSelected="true"
+             id="new.tapestry"
+             mandatory="false"
+             name="test Tapestry 5 Web Application">
+          <location>
+             <mavenLocation
+                   artifactId="quickstart"
+                   groupId="org.apache.tapestry"
+                   repository="http://tapestry.apache.org"
+                   version="5.3.7">
+             </mavenLocation>
+          </location>
+          <configurationReference
+                configurationId="net.atos.webtools.tapestry.configuration.generic">
+          </configurationReference>
+       </module>
+    </profile>
+ </extension>
 </plugin>
