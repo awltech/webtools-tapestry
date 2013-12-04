@@ -94,7 +94,7 @@ public class FeatureFinder extends Job{
 		if (projectModel != null && projectModel.getJavaProject() != null) {
 			monitor.beginTask("Tapestry Finder for " + projectModel.getJavaProject().getProject().getName(), IProgressMonitor.UNKNOWN);
 			
-			monitor.subTask("Retrieving Package Fragment Roots of project <"+projectModel.getJavaProject().getProject().getName()+">");
+			monitor.subTask("Retrieving Package Fragment Roots of project");
 			//Loads PackageFragmentRoots (source folders, and all jars in classpath)
 			IPackageFragmentRoot[] packageFragmentRoots;
 			try {
@@ -133,14 +133,14 @@ public class FeatureFinder extends Job{
 					//STEP-1-A: This is a Core Library (nothing special can be found in the Manifest)
 					IPackageFragment corePackageFragment = iPackageFragmentRoot.getPackageFragment(Constants.TAPESTRY5_CORELIB_PACKAGE);
 					if(corePackageFragment != null  && corePackageFragment.exists()){
-						monitor.subTask("Resolving features from package in dependency <"+iPackageFragmentRoot.getResource().getName()+">");	
+						monitor.subTask("Resolving features from package in dependency");	
 						for (FeatureType featureType : FeatureType.values()) {
 							loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, "", Constants.TAPESTRY5_CORELIB_PACKAGE, featureType);
 						}
 					}
 					//STEP-1-B: This is a custom Library ("tapestry-module-classes" property can be found in the path)
 					else{
-						monitor.subTask("Resolving components from manifest in dependency <"+iPackageFragmentRoot.getResource().getName()+">");
+						monitor.subTask("Resolving components from manifest in dependency");
 						Manifest manifest = getManifest(iPackageFragmentRoot);
 						if(manifest != null){
 							String appModule = manifest.getMainAttributes().getValue(Constants.TAPESTRY_MANIFEST_PROPERTY);
@@ -167,7 +167,7 @@ public class FeatureFinder extends Job{
 					//STEP-2-A: sources from the project itself:
 					if(iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()){
 						if(projectModel.getAppPackage() != null){
-							monitor.subTask("Resolving features in this project's sources <"+iPackageFragmentRoot.getResource().getName()+">");
+							monitor.subTask("Resolving features in this project's sources");
 							for (FeatureType featureType : FeatureType.values()) {
 								loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, "", projectModel.getAppPackage(), featureType);
 							}
@@ -179,7 +179,7 @@ public class FeatureFinder extends Job{
 						 * Usually, the manifest is found in only one of the PackageFragment (often src/main,/resources),
 						 * but then, the sources are in the siblings PackageFragments (i.e. src/main/java)
 						 */
-						monitor.subTask("Resolving features in this dependency's sources <"+iPackageFragmentRoot.getResource().getName()+">");
+						monitor.subTask("Resolving features in this dependency's sources");
 						ProjectModel otherProjectModel = new ProjectModel(iPackageFragmentRoot.getJavaProject());
 						otherProjectModel.init();
 						if(otherProjectModel.getAppModule() != null){
