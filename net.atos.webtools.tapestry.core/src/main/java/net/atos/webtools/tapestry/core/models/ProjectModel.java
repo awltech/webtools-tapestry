@@ -361,6 +361,8 @@ public class ProjectModel {
 		}
 	}
 	
+	private static final FeatureFinderSchedulingRule RULE = new FeatureFinderSchedulingRule();
+	
 	/**
 	 * Asynchronously launch a FeatureFinder that will load the Components, Pages, Mixins... 
 	 * that are contained in the project, and dependencies. 
@@ -371,6 +373,7 @@ public class ProjectModel {
 		
 		//---- Searches asynchronously for other components in the classpath ----
 		FeatureFinder featureFinder = new FeatureFinder(this);
+		featureFinder.setRule(RULE);
 		featureFinder.schedule();
 	}
 }

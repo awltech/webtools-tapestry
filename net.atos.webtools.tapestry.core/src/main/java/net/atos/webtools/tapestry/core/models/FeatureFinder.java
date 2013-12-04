@@ -31,6 +31,7 @@ import net.atos.webtools.tapestry.core.util.Messages;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -66,7 +67,7 @@ import org.eclipse.jdt.internal.core.util.Util;
  *
  */
 @SuppressWarnings("restriction")
-public class FeatureFinder extends Job{
+public class FeatureFinder extends WorkspaceJob {
 	/*
 	 * Method names:
 	 */
@@ -87,10 +88,11 @@ public class FeatureFinder extends Job{
 	public FeatureFinder(ProjectModel projectModel) {
 		super("Tapestry Finder for " + projectModel.getJavaProject().getProject().getName());
 		this.projectModel = projectModel;
+		this.setPriority(Job.BUILD);
 	}
 
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
+	public IStatus runInWorkspace(IProgressMonitor monitor) {
 		if (projectModel != null && projectModel.getJavaProject() != null) {
 			monitor.beginTask("Tapestry Finder for " + projectModel.getJavaProject().getProject().getName(), IProgressMonitor.UNKNOWN);
 			
