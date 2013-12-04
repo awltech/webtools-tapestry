@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  * Scheduling rule that will ensure that two jobs will not be executed at the same time (to prevent from locks)
  * 
  * @author mvanbesien
+ * @since 1.2
  *
  */
 public class FeatureFinderSchedulingRule implements ISchedulingRule {
