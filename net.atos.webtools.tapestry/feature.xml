@@ -177,6 +177,10 @@ permanent authorization for you to choose that version for the
 Library.
    </license>
 
+   <url>
+      <discovery label="AppProfiles" url="http://eclipse.worldline.com/nightly/appprofiles"/>
+   </url>
+
    <requires>
       <import feature="com.worldline.appprofiles.wizard" version="1.0.0.qualifier"/>
    </requires>

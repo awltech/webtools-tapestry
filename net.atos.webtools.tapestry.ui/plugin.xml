@@ -398,12 +398,12 @@
           description="This profile creates a Web application based on the Tapestry framework."
           id="net.atos.webtools.tapestry.profile"
           kind="Standard"
-          name="Test Tapestry 5 Web Application">
+          name="Tapestry 5 Web Application">
        <module
              defaultSelected="true"
              id="new.tapestry"
              mandatory="false"
-             name="test Tapestry 5 Web Application">
+             name="Tapestry 5 Web Application">
           <location>
              <mavenLocation
                    artifactId="quickstart"
