@@ -7,6 +7,7 @@ import net.atos.webtools.tapestry.ui.util.UIConstants;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +33,7 @@ import org.eclipse.wst.xml.ui.internal.XMLUIMessages;
 public class ContentAssistPreferencePage extends AbstractPreferencePage implements
 		IWorkbenchPreferencePage {
 
+	private Button fIncrementalProjectCrawling;
 	// Auto Activation
 	private Button fAutoPropose;
 	private Label fAutoProposeDelayLabel;
@@ -48,6 +50,10 @@ public class ContentAssistPreferencePage extends AbstractPreferencePage implemen
 	protected Control createContents(Composite parent) {
 		final Composite composite = super.createComposite(parent, 1);
 		
+		fIncrementalProjectCrawling = new Button(composite, SWT.CHECK);
+		fIncrementalProjectCrawling.setText("Compute Assist Contents incrementally (INCUBATION)");
+		fIncrementalProjectCrawling.setToolTipText("When enabled, only the scope of a modified resource will be reparsed to compute assist updates, which makes computation faster.\nHence, if you feel not all the information is available during assist, please keep this option unchecked.");
+		
 		createContentsForAutoActivationGroup(composite);
 		createContentsForCyclingGroup(composite);
 		
@@ -61,6 +67,7 @@ public class ContentAssistPreferencePage extends AbstractPreferencePage implemen
 	 * @see org.eclipse.wst.sse.ui.internal.preferences.ui.AbstractPreferencePage#performDefaults()
 	 */
 	protected void performDefaults() {
+		fIncrementalProjectCrawling.setSelection(getPreferenceStore().getDefaultBoolean(TapestryPreferenceNames.INCREMENTAL_CRAWLING));
 		performDefaultsForAutoActivationGroup();
 		performDefaultsForCyclingGroup();
 
@@ -74,6 +81,7 @@ public class ContentAssistPreferencePage extends AbstractPreferencePage implemen
 	 * @see org.eclipse.wst.sse.ui.internal.preferences.ui.AbstractPreferencePage#initializeValues()
 	 */
 	protected void initializeValues() {
+		fIncrementalProjectCrawling.setSelection(getPreferenceStore().getBoolean(TapestryPreferenceNames.INCREMENTAL_CRAWLING));
 		initializeValuesForAutoActivationGroup();
 		initializeValuesForCyclingGroup();
 	}
@@ -82,6 +90,7 @@ public class ContentAssistPreferencePage extends AbstractPreferencePage implemen
 	 * @see org.eclipse.wst.sse.ui.internal.preferences.ui.AbstractPreferencePage#storeValues()
 	 */
 	protected void storeValues() {
+		getPreferenceStore().setValue(TapestryPreferenceNames.INCREMENTAL_CRAWLING, fIncrementalProjectCrawling.getSelection());
 		storeValuesForAutoActivationGroup();
 		storeValuesForCyclingGroup();
 	}

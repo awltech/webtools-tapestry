@@ -38,4 +38,6 @@ public class TapestryPreferenceNames {
 
 	public static final String CONTENT_ASSIST_DEFAULT_PAGE_SORT_ORDER = "html_content_assist_default_page_sort_order";
 
+	public static final String INCREMENTAL_CRAWLING = "incrementalFeatureFinding";
+
 }
