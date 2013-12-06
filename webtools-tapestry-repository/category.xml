@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-	<feature url="features/net.atos.webtools.tapestry_1.2.0.qualifier.jar"
-		id="net.atos.webtools.tapestry" version="1.2.0.qualifier" />
+   <feature url="features/net.atos.webtools.tapestry_1.2.0.qualifier.jar" id="net.atos.webtools.tapestry" version="1.2.0.qualifier">
+      <category name="Webtools for Tapestry (WTT)"/>
+   </feature>
+   <category-def name="Webtools for Tapestry (WTT)" label="Webtools for Tapestry (WTT)"/>
 </site>
