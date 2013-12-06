@@ -1,6 +1,7 @@
 package net.atos.webtools.tapestry.core.models;
 
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.jdt.core.IJavaElement;
 
 /**
  * Scheduling rule that will ensure that two jobs will not be executed at the same time (to prevent from locks)
@@ -17,7 +18,14 @@ public class FeatureFinderSchedulingRule implements ISchedulingRule {
 	 */
 	@Override
 	public boolean contains(ISchedulingRule rule) {
-		return rule == this;
+		// If rule is instance of self, check the equality
+		if (rule instanceof FeatureFinderSchedulingRule)
+			return rule == this;
+		// As the referenced job acts on projects, this rule should support all IJavaElements...
+		if (rule instanceof IJavaElement)
+			return true;
+		// If one of case above not supported, returns false.
+		return false;
 	}
 
 	/*
