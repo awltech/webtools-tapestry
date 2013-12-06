@@ -25,6 +25,7 @@ import net.atos.webtools.tapestry.core.util.helpers.WebXmlHelper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -368,12 +369,21 @@ public class ProjectModel {
 	 * that are contained in the project, and dependencies. 
 	 */
 	public void loadSubFeatures(){
+		this.loadSubFeatures(null);
+	}
+	
+	/**
+	 * Asynchronously launch a FeatureFinder that will load the Components, Pages, Mixins... 
+	 * that are contained in the project, and dependencies. 
+	 */
+	public void loadSubFeatures(IResourceDelta resourceDelta){
 		//------------ defaults components -------------
 		this.addComponent(new ComponentModel(Constants.TAPESTRY_CORE, Constants.BLOCK, Messages.BLOCK_JAVADOC, Constants.TAPESTRY_CORE));
 		
 		//---- Searches asynchronously for other components in the classpath ----
 		FeatureFinder featureFinder = new FeatureFinder(this);
 		featureFinder.setRule(RULE);
+		featureFinder.limitToResourceDelta(resourceDelta);
 		featureFinder.schedule();
 	}
 }
