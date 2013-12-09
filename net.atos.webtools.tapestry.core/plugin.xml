@@ -4,7 +4,7 @@
    <extension-point id="net.atos.webtools.tapestry.core.components.libs" 
    		name="Component libs for Tapestry" 
    		schema="schema/net.atos.webtools.tapestry.core.components.libs.exsd"/>
-   		
+   	 <extension-point id="listeners" name="listeners" schema="schema/listeners.exsd"/>	
    		<extension
 	       point="net.atos.webtools.tapestry.core.components.libs">
 	    <library
