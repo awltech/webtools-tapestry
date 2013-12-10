@@ -433,7 +433,7 @@ public class EditedFeatureModel {
 			String classContent;
 			try {
 				classContent = inputStream2String(getJavaFile().getContents());
-				ASTParser parser = ASTParser.newParser(AST.JLS3);
+				ASTParser parser = ASTParser.newParser(AST.JLS4);
 				parser.setSource(classContent.toCharArray());
 				parser.setKind(ASTParser.K_COMPILATION_UNIT);
 				final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
@@ -510,7 +510,7 @@ public class EditedFeatureModel {
 	 * @param classContent
 	 */
 	private void parseClassPropertiesWithAST(String classContent) {
-		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(classContent.toCharArray());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
