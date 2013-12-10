@@ -74,7 +74,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-version>0.14.0</tycho-version>
-		<format>yyyyMMddHHmm</format>
+		<platform-version-name>kepler</platform-version-name>
+		<platform-tag>e43x</platform-tag>
+		<release-type>SNAPSHOT</release-type>
+		<format>yyyyMMddHHmm'-${platform-version-name}-${release-type}'</format>
 	</properties>
 
 	<profiles>
