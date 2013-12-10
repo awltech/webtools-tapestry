@@ -1,16 +1,19 @@
 package net.atos.webtools.tapestry.core.models;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.jdt.core.IJavaElement;
 
 /**
- * Scheduling rule that will ensure that two jobs will not be executed at the same time (to prevent from locks)
+ * Scheduling rule to ensure that two Feature Finder jobs are not started at the same time (prevents locks)
  * 
  * @author mvanbesien
- * @since 1.2
  *
  */
 public class FeatureFinderSchedulingRule implements ISchedulingRule {
+
+	private final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	/*
 	 * (non-Javadoc)
@@ -18,14 +21,10 @@ public class FeatureFinderSchedulingRule implements ISchedulingRule {
 	 */
 	@Override
 	public boolean contains(ISchedulingRule rule) {
-		// If rule is instance of self, check the equality
-		if (rule instanceof FeatureFinderSchedulingRule)
-			return rule == this;
-		// As the referenced job acts on projects, this rule should support all IJavaElements...
-		if (rule instanceof IJavaElement)
-			return true;
-		// If one of case above not supported, returns false.
-		return false;
+		if (rule instanceof IResource) {
+			return this.workspaceRoot.contains(rule);
+		}
+		return rule instanceof FeatureFinderSchedulingRule;
 	}
 
 	/*
