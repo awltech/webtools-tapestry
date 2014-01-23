@@ -27,7 +27,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  org.eclipse.jdt.debug.ui,
  org.eclipse.pde.ui,
- net.atos.webtools.tapestry.core;bundle-version="1.2.0"
+ net.atos.webtools.tapestry.core;bundle-version="1.2.0",
+ com.worldline.appprofiles.wizard.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: https://github.com/awltech
