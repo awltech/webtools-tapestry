@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -315,7 +316,7 @@ public class ProjectModel {
 		if(this.getAppPackage() == null){
 			try {
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject.getPackageFragmentRoots()) {
-					Manifest manifest = FeatureFinder.getManifest(packageFragmentRoot);
+					Manifest manifest = FeatureFinder.getManifest(packageFragmentRoot, new NullProgressMonitor());
 					if(manifest != null){
 						appModule = manifest.getMainAttributes().getValue(Constants.TAPESTRY_MANIFEST_PROPERTY);
 						if(appModule != null && appModule.contains(SERVICES_PACK)){

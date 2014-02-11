@@ -130,7 +130,7 @@ public class FeatureFinder extends WorkspaceJob {
 					+ projectModel.getJavaProject().getProject().getName() + ">");
 			ClassLoader classLoader = null;
 			try {
-				classLoader = getCLassLoader(packageFragmentRoots);
+				classLoader = getCLassLoader(packageFragmentRoots, monitor);
 			} catch (JavaModelException e) {
 				TapestryCore.logWarning(ErrorMessages.CAN_T_SEARCH_DYNAMICALLY_FOR_TAPESTRY_LIBS, e);
 			}
@@ -156,31 +156,51 @@ public class FeatureFinder extends WorkspaceJob {
 					IPackageFragment corePackageFragment = iPackageFragmentRoot
 							.getPackageFragment(Constants.TAPESTRY5_CORELIB_PACKAGE);
 					if (corePackageFragment != null && corePackageFragment.exists()) {
-						monitor.subTask("Resolving features from package in dependency");
 						for (FeatureType featureType : FeatureType.values()) {
+							monitor.subTask("Resolving features from package in Core Library JAR: "
+									+ iPackageFragmentRoot.getElementName() + " for feature: "
+									+ featureType.getSubPackage());
 							loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, "",
-									Constants.TAPESTRY5_CORELIB_PACKAGE, featureType);
+									Constants.TAPESTRY5_CORELIB_PACKAGE, featureType, monitor);
+							if (monitor.isCanceled())
+								return new Status(IStatus.CANCEL, TapestryCore.PLUGIN_ID,
+										"Job cancelled while resolving features from package in Core Library JAR: "
+												+ iPackageFragmentRoot.getElementName() + " for feature: "
+												+ featureType.getSubPackage());
+
 						}
 					}
 					// STEP-1-B: This is a custom Library
 					// ("tapestry-module-classes" property can be found in the
 					// path)
 					else {
-						monitor.subTask("Resolving components from manifest in dependency");
-						Manifest manifest = getManifest(iPackageFragmentRoot);
+						monitor.subTask("Resolving components from manifest in Custom Library JAR: "
+								+ iPackageFragmentRoot.getElementName());
+						Manifest manifest = getManifest(iPackageFragmentRoot, monitor);
 						if (manifest != null) {
 							String appModule = manifest.getMainAttributes().getValue(
 									Constants.TAPESTRY_MANIFEST_PROPERTY);
 							if (appModule != null) {
-								String[] prefixPackageStrings = getPackageInfoByReflection(classLoader, appModule);
-
+								String[] prefixPackageStrings = getPackageInfoByReflection(classLoader, appModule, monitor);
+								if (monitor.isCanceled())
+									return new Status(IStatus.CANCEL, TapestryCore.PLUGIN_ID,
+											"Job cancelled while resolving features from package in Custom Library JAR: "
+													+ iPackageFragmentRoot.getElementName());
 								if (prefixPackageStrings != null && prefixPackageStrings.length > 1
 										&& prefixPackageStrings[0] != null && prefixPackageStrings[1] != null) {
 									String prefix = prefixPackageStrings[0];
 									String appPackageName = prefixPackageStrings[1];
 									for (FeatureType featureType : FeatureType.values()) {
+										monitor.subTask("Resolving components from manifest in Custom Library JAR: "
+												+ iPackageFragmentRoot.getElementName() + "for feature; "
+												+ featureType.getSubPackage());
 										loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, prefix,
-												appPackageName, featureType);
+												appPackageName, featureType, monitor);
+										if (monitor.isCanceled())
+											return new Status(IStatus.CANCEL, TapestryCore.PLUGIN_ID,
+													"Job cancelled while resolving features from package in Custom Library JAR: "
+															+ iPackageFragmentRoot.getElementName() + " for feature: "
+															+ featureType.getSubPackage());
 									}
 								}
 							}
@@ -193,14 +213,14 @@ public class FeatureFinder extends WorkspaceJob {
 				else {
 					monitor.subTask("Resolving assets from package in dependency <"
 							+ iPackageFragmentRoot.getResource().getName() + ">");
-					loadAssets(iPackageFragmentRoot);
+					loadAssets(iPackageFragmentRoot, monitor);
 					// STEP-2-A: sources from the project itself:
 					if (iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()) {
 						if (projectModel.getAppPackage() != null) {
 							monitor.subTask("Resolving features in this project's sources");
 							for (FeatureType featureType : FeatureType.values()) {
 								loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, "",
-										projectModel.getAppPackage(), featureType);
+										projectModel.getAppPackage(), featureType, monitor);
 							}
 						}
 					}
@@ -218,14 +238,14 @@ public class FeatureFinder extends WorkspaceJob {
 						otherProjectModel.init();
 						if (otherProjectModel.getAppModule() != null) {
 							String[] prefixPackageStrings = getPackageInfoByReflection(classLoader,
-									otherProjectModel.getAppModule());
+									otherProjectModel.getAppModule(), monitor);
 							if (prefixPackageStrings != null && prefixPackageStrings.length > 1
 									&& prefixPackageStrings[0] != null && prefixPackageStrings[1] != null) {
 								String prefix = prefixPackageStrings[0];
 								String appPackageName = prefixPackageStrings[1];
 								for (FeatureType featureType : FeatureType.values()) {
 									loadFeaturesFromPackageFragmentRoot(iPackageFragmentRoot, prefix, appPackageName,
-											featureType);
+											featureType, monitor);
 								}
 							}
 						}
@@ -247,7 +267,7 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            Project model
 	 * 
 	 */
-	private void loadAssets(IPackageFragmentRoot iPackageFragmentRoot) {
+	private void loadAssets(IPackageFragmentRoot iPackageFragmentRoot, IProgressMonitor monitor) {
 		if (iPackageFragmentRoot != null && iPackageFragmentRoot.exists()) {
 			Object[] resources = null;
 			try {
@@ -260,9 +280,14 @@ public class FeatureFinder extends WorkspaceJob {
 			}
 			for (Object asset : resources) {
 				if (iPackageFragmentRoot.getPath().toString().contains("webapp")) {
-					loadAssetsFromContext(asset, iPackageFragmentRoot);
+					if (asset instanceof IResource)
+						loadAssetsFromContext((IResource) asset, iPackageFragmentRoot, monitor);
 				} else {
-					loadAssetsFromClassPath(asset, iPackageFragmentRoot);
+					if (asset instanceof IResource)
+						loadAssetsFromClassPath((IResource) asset, iPackageFragmentRoot, monitor);
+				}
+				if (monitor.isCanceled()) {
+					return;
 				}
 			}
 		}
@@ -282,12 +307,17 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            PackageFragmentRoot to which asset is belong
 	 * 
 	 */
-	private void loadAssetsFromClassPath(Object asset, IPackageFragmentRoot iPackageFragmentRoot) {
+	private void loadAssetsFromClassPath(IResource asset, IPackageFragmentRoot iPackageFragmentRoot, IProgressMonitor monitor) {
+		if (asset == null)
+			return;
+		monitor.subTask("Loading asset from classpath: "+asset.getName()+" in package "+iPackageFragmentRoot.getElementName());
 		try {
 			if (IFolder.class.isInstance(asset)) {
 				IFolder folder = (IFolder) asset;
 				for (IResource iResource : folder.members()) {
-					loadAssetsFromClassPath(iResource, iPackageFragmentRoot);
+					loadAssetsFromClassPath(iResource, iPackageFragmentRoot, monitor);
+					if (monitor.isCanceled())
+						return;
 				}
 			} else if (IFile.class.isInstance(asset)) {
 				IFile iFile = (IFile) asset;
@@ -317,13 +347,16 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            PackageFragmentRoot to which asset is belong
 	 * 
 	 */
-	private void loadAssetsFromContext(Object asset, IPackageFragmentRoot iPackageFragmentRoot) {
+	private void loadAssetsFromContext(IResource asset, IPackageFragmentRoot iPackageFragmentRoot, IProgressMonitor monitor) {
+		if (asset == null)
+			return;
+		monitor.subTask("Loading asset from context: "+asset.getName()+" in package "+iPackageFragmentRoot.getElementName());
 		try {
 			if (IFolder.class.isInstance(asset)) {
 				IFolder folder = (IFolder) asset;
 				if (!("WEB-INF".equals(folder.getName()))) {
 					for (IResource iResource : folder.members()) {
-						loadAssetsFromContext(iResource, iPackageFragmentRoot);
+						loadAssetsFromContext(iResource, iPackageFragmentRoot, monitor);
 					}
 				}
 			} else if (IFile.class.isInstance(asset)) {
@@ -348,8 +381,9 @@ public class FeatureFinder extends WorkspaceJob {
 	 * @param featureType
 	 */
 	private void loadFeaturesFromPackageFragmentRoot(IPackageFragmentRoot packageFragmentRoot, String prefix,
-			String appPackageName, FeatureType featureType) {
+			String appPackageName, FeatureType featureType, IProgressMonitor monitor) {
 		if (packageFragmentRoot != null && packageFragmentRoot.exists() && appPackageName != null) {
+			monitor.subTask("Loading feature from package: "+packageFragmentRoot.getElementName()+" of type "+featureType.getSubPackage());
 			IJavaElement[] children;
 			try {
 				children = packageFragmentRoot.getChildren();
@@ -372,9 +406,11 @@ public class FeatureFinder extends WorkspaceJob {
 							subPackage = "";
 						}
 
-						loadFeaturesFromPackageFragment(featureType, prefix, classesPackage, subPackage);
+						loadFeaturesFromPackageFragment(featureType, prefix, classesPackage, subPackage, monitor);
 					}
 				}
+				if (monitor.isCanceled())
+					return;
 			}
 		}
 	}
@@ -394,14 +430,14 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            : the sub-package inside "components", if any, or empty String
 	 */
 	private void loadFeaturesFromPackageFragment(FeatureType featureType, String prefix,
-			IPackageFragment classesPackage, String subPackage) {
+			IPackageFragment classesPackage, String subPackage, IProgressMonitor monitor) {
 		if (classesPackage != null && classesPackage.exists()) {
 			String source = classesPackage.getPath().toPortableString();
 			try {
 				ITypeRoot[] classFiles = classesPackage.getClassFiles();
 				for (ITypeRoot classFile : classFiles) {
 					if (classFile.exists() && !classFile.getElementName().contains("$")) {
-						loadFeatureFromClass(featureType, classFile, prefix, source, subPackage);
+						loadFeatureFromClass(featureType, classFile, prefix, source, subPackage, monitor);
 					}
 				}
 			} catch (JavaModelException jme) {
@@ -413,7 +449,7 @@ public class FeatureFinder extends WorkspaceJob {
 				ICompilationUnit[] compilationUnits = classesPackage.getCompilationUnits();
 				for (ICompilationUnit compilationUnit : compilationUnits) {
 					if (compilationUnit.exists() && !compilationUnit.getElementName().contains("$")) {
-						loadFeatureFromClass(featureType, compilationUnit, prefix, source, subPackage);
+						loadFeatureFromClass(featureType, compilationUnit, prefix, source, subPackage, monitor);
 					}
 				}
 			} catch (JavaModelException jme) {
@@ -434,7 +470,8 @@ public class FeatureFinder extends WorkspaceJob {
 	 * @param subPackage
 	 */
 	private void loadFeatureFromClass(FeatureType featureType, ITypeRoot typeRoot, String prefix, String source,
-			String subPackage) {
+			String subPackage, IProgressMonitor monitor) {
+		monitor.subTask("Loading feature from class: "+typeRoot.getElementName()+" of type "+featureType.getSubPackage());
 		if (projectModel != null && typeRoot != null) {
 			IType type = typeRoot.findPrimaryType();
 			if (type != null) {
@@ -465,11 +502,11 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            the fully qualified paramName of the AppModule class
 	 * @return
 	 */
-	private String[] getPackageInfoByReflection(ClassLoader classLoader, String appModule) {
+	private String[] getPackageInfoByReflection(ClassLoader classLoader, String appModule, IProgressMonitor monitor) {
 		String[] prefixPackageStrings = new String[2];
-
+		monitor.subTask("Retrieving Packages from reflexion...");
 		if (classLoader == null) {
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		}
 
 		try {
@@ -512,7 +549,7 @@ public class FeatureFinder extends WorkspaceJob {
 			} else {
 				// Activator.logWarning("Reflection failed for " + appModule +
 				// " -> No component loaded.");
-				return getPackageInfoByExtensionPoint(appModule);
+				return getPackageInfoByExtensionPoint(appModule, monitor);
 			}
 
 			try {
@@ -557,23 +594,23 @@ public class FeatureFinder extends WorkspaceJob {
 		} catch (NoSuchMethodException e) {
 			// Activator.logInfo("Reflection failed for " + appModule +
 			// " -> No component loaded.\n" + e.getMessage());
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		} catch (ClassNotFoundException e) {
 			// Activator.logError("Reflection failed for " + appModule +
 			// " -> No component loaded.\n" + e.getMessage());
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		} catch (IllegalArgumentException e) {
 			// Activator.logError("Reflection failed for " + appModule +
 			// " -> No component loaded.\n" + e.getMessage());
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		} catch (Exception e) {
 			// Activator.logWarning("Reflection failed for " + appModule +
 			// " -> No component loaded.", e);
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		} catch (LinkageError e) {
 			// Activator.logWarning("Reflection failed for " + appModule +
 			// " -> No component loaded.", e);
-			return getPackageInfoByExtensionPoint(appModule);
+			return getPackageInfoByExtensionPoint(appModule, monitor);
 		}
 	}
 
@@ -586,7 +623,8 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            : the fully qualified name of the appModule
 	 * @return String[]{prefix, package}
 	 */
-	private String[] getPackageInfoByExtensionPoint(String appModule) {
+	private String[] getPackageInfoByExtensionPoint(String appModule, IProgressMonitor monitor) {
+		monitor.subTask("Retrieving Packages from extension point...");
 		String[] prefixPackageStrings = new String[2];
 		if (appModule != null && appModule.length() > 0) {
 			IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(TapestryCore.PLUGIN_ID,
@@ -601,11 +639,15 @@ public class FeatureFinder extends WorkspaceJob {
 							// Activator.logInfo("... found in the extension points - "
 							// + appModule);
 						}
+						if (monitor.isCanceled())
+							return prefixPackageStrings;
 					}
+					if (monitor.isCanceled())
+						return prefixPackageStrings;
 				}
 			}
 			if (prefixPackageStrings[0] == null || prefixPackageStrings[1] == null) {
-				return getPackageInfoByDeduction(appModule);
+				return getPackageInfoByDeduction(appModule, monitor);
 			}
 		}
 		return prefixPackageStrings;
@@ -620,7 +662,8 @@ public class FeatureFinder extends WorkspaceJob {
 	 * @param appModule
 	 * @return
 	 */
-	private String[] getPackageInfoByDeduction(String appModule) {
+	private String[] getPackageInfoByDeduction(String appModule, IProgressMonitor monitor) {
+		monitor.subTask("Retrieving Packages from deduction...");
 		String[] prefixPackageStrings = new String[2];
 		if (appModule.contains(".services")) {
 			prefixPackageStrings[0] = "?";
@@ -641,7 +684,9 @@ public class FeatureFinder extends WorkspaceJob {
 	 * @return the ClassLoader
 	 * @throws JavaModelException
 	 */
-	private ClassLoader getCLassLoader(IPackageFragmentRoot[] packageFragmentRoots) throws JavaModelException {
+	private ClassLoader getCLassLoader(IPackageFragmentRoot[] packageFragmentRoots, IProgressMonitor monitor) throws JavaModelException {
+		
+		monitor.subTask("Building Class Loader...");
 		// STEP-1: jarclassloader with all the jars (and the plugin one as
 		// parent)
 
@@ -699,7 +744,8 @@ public class FeatureFinder extends WorkspaceJob {
 	 *            the IPackageFragmentRoot to scan
 	 * @return the manifest or null if it's not found
 	 */
-	protected static Manifest getManifest(IPackageFragmentRoot packageFragmentRoot) {
+	protected static Manifest getManifest(IPackageFragmentRoot packageFragmentRoot, IProgressMonitor monitor) {
+		monitor.subTask("Retrieving Manifest from Package: "+packageFragmentRoot.getElementName());
 		try {
 			if (packageFragmentRoot.exists()) {
 				Object[] nonJavaResources = packageFragmentRoot.getNonJavaResources();
@@ -729,6 +775,8 @@ public class FeatureFinder extends WorkspaceJob {
 							return manifest;
 						}
 					}
+					if (monitor.isCanceled())
+						return null;
 				}
 			}
 		} catch (Exception e) {
