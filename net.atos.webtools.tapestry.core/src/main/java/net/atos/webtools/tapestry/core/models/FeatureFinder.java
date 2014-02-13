@@ -78,6 +78,7 @@ public class FeatureFinder extends WorkspaceJob {
 	private static final String GET_PATH_PREFIX = "getPathPrefix";
 	private static final String CONTRIBUTE_COMPONENT_CLASS_RESOLVER = "contributeComponentClassResolver";
 	private static final String FILE_PATTERN = "((.*?)+(\\.(?i)(java|tml|properties|xml|manifest|class))$)";
+	private static final String[] FILE_EXTENSIONS = {"java", "tml", "properties", "xml", "manifest", "class"};
 	private static final Pattern pattern = Pattern.compile(FILE_PATTERN);
 
 	private ProjectModel projectModel;
@@ -310,6 +311,8 @@ public class FeatureFinder extends WorkspaceJob {
 	private void loadAssetsFromClassPath(IResource asset, IPackageFragmentRoot iPackageFragmentRoot, IProgressMonitor monitor) {
 		if (asset == null)
 			return;
+		if (monitor.isCanceled())
+			return;
 		monitor.subTask("Loading asset from classpath: "+asset.getName()+" in package "+iPackageFragmentRoot.getElementName());
 		try {
 			if (IFolder.class.isInstance(asset)) {
@@ -321,8 +324,8 @@ public class FeatureFinder extends WorkspaceJob {
 				}
 			} else if (IFile.class.isInstance(asset)) {
 				IFile iFile = (IFile) asset;
-				Matcher matcher = pattern.matcher(iFile.getName());
-				if (iFile.getFileExtension() != null && !matcher.matches()) {
+				String fileExtension = iFile.getFileExtension();
+				if (fileExtension != null && arrayContains(FILE_EXTENSIONS, fileExtension)) {
 					projectModel.addAssetsFromClassPath((new AssetModel(iFile.getName(), Util.relativePath(
 							iFile.getProjectRelativePath(), iPackageFragmentRoot.getPath().segmentCount() - 1))));
 				}
@@ -332,6 +335,14 @@ public class FeatureFinder extends WorkspaceJob {
 		}
 	}
 
+	private static final <T> boolean arrayContains(T[] array, T value) {
+		for (int i = 0;i<array.length;i++) {
+			if (array[i] != null ? array[i].equals(value) : value == null)
+				return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Loads the asset from web context to project model.</br> If the provided
 	 * asset is a folder then find all the static assets present inside the
