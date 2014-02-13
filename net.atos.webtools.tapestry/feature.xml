@@ -2,7 +2,7 @@
 <feature
       id="net.atos.webtools.tapestry"
       label="Web Tools for Tapestry - WTT"
-      version="1.2.0.qualifier"
+      version="1.2.1.qualifier"
       provider-name="https://github.com/awltech">
 
    <description>
@@ -189,14 +189,14 @@ Library.
          id="net.atos.webtools.tapestry.core"
          download-size="0"
          install-size="0"
-         version="1.2.0.qualifier"
+         version="1.2.1.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.atos.webtools.tapestry.ui"
          download-size="0"
          install-size="0"
-         version="1.2.0.qualifier"
+         version="1.2.1.qualifier"
          unpack="false"/>
 
 </feature>

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>webtools-tapestry-parent</artifactId>
 		<groupId>net.atos</groupId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>net.atos.webtools.tapestry</artifactId>
