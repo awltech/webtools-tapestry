@@ -47,6 +47,15 @@
 			<timezone>+5.5</timezone>
 			<organization>awltech</organization>
 		</developer>
+		<developer>
+			<name>mvanbesien</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<url>https://github.com/mvanbesien</url>
+			<timezone>+1</timezone>
+			<organization>awltech</organization>
+		</developer>
 	</developers>
 
 	<issueManagement>
@@ -90,6 +99,11 @@
 	</profiles>
 
 	<repositories>
+		<repository>
+			<id>wltech-final-appprofiles</id>
+			<layout>p2</layout>
+			<url>http://eclipse.worldline.com/releases/kepler/appprofiles/</url>
+		</repository>
 		<repository>
 			<id>indigo</id>
 			<layout>p2</layout>
