@@ -213,7 +213,7 @@ public class FeatureFinder extends WorkspaceJob {
 				// ------------
 				else {
 					monitor.subTask("Resolving assets from package in dependency <"
-							+ iPackageFragmentRoot.getResource().getName() + ">");
+							+ iPackageFragmentRoot.getElementName() + ">");
 					loadAssets(iPackageFragmentRoot, monitor);
 					// STEP-2-A: sources from the project itself:
 					if (iPackageFragmentRoot.getJavaProject() == projectModel.getJavaProject()) {
